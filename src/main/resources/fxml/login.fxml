@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="root" styleClass="root" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.rmcs.controller.LoginController">
+
+    <!-- ================= 背景装饰光斑 ================= -->
+    <StackPane styleClass="deco, deco-1" AnchorPane.leftAnchor="-160" AnchorPane.topAnchor="-160"/>
+    <StackPane styleClass="deco, deco-2" AnchorPane.rightAnchor="-120" AnchorPane.bottomAnchor="-180"/>
+    <StackPane styleClass="deco, deco-3" AnchorPane.leftAnchor="300" AnchorPane.bottomAnchor="-150"/>
+    <StackPane styleClass="deco, deco-4" AnchorPane.rightAnchor="380" AnchorPane.topAnchor="-90"/>
+
+    <!-- ================= 顶部标题栏 ================= -->
+    <HBox fx:id="titleBar" styleClass="title-bar" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+        <StackPane styleClass="title-logo">
+            <Label styleClass="title-logo-text" text="R"/>
+        </StackPane>
+        <VBox styleClass="title-text-box">
+            <Label styleClass="title-main" text="RMCS 测阻机控制系统"/>
+            <Label styleClass="title-sub" text="Resistance Measuring Control System"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnMin" styleClass="win-btn" onAction="#onMin" text="—"/>
+        <Button fx:id="btnClose" styleClass="win-btn, win-close" onAction="#onClose" text="✕"/>
+    </HBox>
+
+    <!-- ================= 主内容区 ================= -->
+    <AnchorPane AnchorPane.topAnchor="56" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0">
+
+        <!-- 左侧品牌区 -->
+        <VBox styleClass="brand-pane" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="520"
+              AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" alignment="CENTER" spacing="24">
+            <padding>
+                <Insets left="80" right="30"/>
+            </padding>
+            <Label styleClass="brand-slogan" text="精准测阻 · 智慧管控"/>
+            <Label styleClass="brand-desc" wrapText="true" maxWidth="420"
+                   text="为测阻机提供全流程数字化控制&#10;数据实时采集 · 运行安全稳定 · 界面简洁易用"/>
+            <HBox styleClass="stat-row" spacing="16">
+                <StackPane styleClass="stat-chip">
+                    <VBox alignment="CENTER" spacing="4">
+                        <Label styleClass="stat-num" text="8,921"/>
+                        <Label styleClass="stat-label" text="今日检测"/>
+                    </VBox>
+                </StackPane>
+                <StackPane styleClass="stat-chip">
+                    <VBox alignment="CENTER" spacing="4">
+                        <Label styleClass="stat-num" text="99.8%"/>
+                        <Label styleClass="stat-label" text="良品率"/>
+                    </VBox>
+                </StackPane>
+                <StackPane styleClass="stat-chip">
+                    <VBox alignment="CENTER" spacing="4">
+                        <Label styleClass="stat-num" text="24h"/>
+                        <Label styleClass="stat-label" text="稳定运行"/>
+                    </VBox>
+                </StackPane>
+            </HBox>
+        </VBox>
+
+        <!-- 右侧登录卡片 -->
+        <StackPane styleClass="card-pane" AnchorPane.leftAnchor="580" AnchorPane.rightAnchor="0"
+                   AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+            <VBox styleClass="card" alignment="TOP_CENTER" spacing="4" maxWidth="380">
+                <padding>
+                    <Insets top="34" bottom="30" left="40" right="40"/>
+                </padding>
+                <StackPane styleClass="login-avatar">
+                    <Label styleClass="login-avatar-icon" text="R"/>
+                </StackPane>
+                <Label styleClass="login-title" text="用户登录"/>
+                <Label styleClass="login-sub" text="请输入账号密码以继续"/>
+                <VBox styleClass="form" spacing="16">
+                    <padding>
+                        <Insets top="22"/>
+                    </padding>
+                    <VBox spacing="6">
+                        <Label styleClass="field-label" text="账号"/>
+                        <HBox styleClass="field" alignment="CENTER_LEFT" spacing="10">
+                            <Label styleClass="field-icon" text="账"/>
+                            <TextField fx:id="accountField" styleClass="field-input" promptText="请输入账号"/>
+                        </HBox>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label styleClass="field-label" text="密码"/>
+                        <HBox styleClass="field" alignment="CENTER_LEFT" spacing="10">
+                            <Label styleClass="field-icon" text="密"/>
+                            <PasswordField fx:id="passwordField" styleClass="field-input" promptText="请输入密码"/>
+                        </HBox>
+                    </VBox>
+                    <Button fx:id="btnLogin" styleClass="btn-primary" text="登  录"
+                            onAction="#onLogin" maxWidth="Infinity"/>
+                    <Button fx:id="btnReset" styleClass="btn-secondary" text="重  置"
+                            onAction="#onReset" maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+            <Label styleClass="version" text="V1.0.0" StackPane.alignment="BOTTOM_RIGHT">
+                <StackPane.margin>
+                    <Insets right="20" bottom="12"/>
+                </StackPane.margin>
+            </Label>
+        </StackPane>
+    </AnchorPane>
+</AnchorPane>

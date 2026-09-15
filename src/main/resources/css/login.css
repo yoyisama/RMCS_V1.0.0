@@ -1,0 +1,231 @@
+/* ============================================================
+   RMCS 测阻机控制系统 - 登录页样式（JavaFX CSS 语法）
+   ============================================================ */
+
+* {
+    -fx-font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+/* ---------------- 根容器：深蓝渐变背景 ---------------- */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #0b2450, #163e86, #2a63c4);
+}
+
+/* ---------------- 背景装饰光斑 ---------------- */
+.deco {
+    -fx-background-radius: 50%;
+}
+.deco-1 {
+    -fx-min-width: 460; -fx-min-height: 460;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
+        rgba(255, 255, 255, 0.14), transparent);
+}
+.deco-2 {
+    -fx-min-width: 520; -fx-min-height: 520;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
+        rgba(96, 181, 255, 0.20), transparent);
+}
+.deco-3 {
+    -fx-min-width: 380; -fx-min-height: 380;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
+        rgba(255, 255, 255, 0.08), transparent);
+}
+.deco-4 {
+    -fx-min-width: 300; -fx-min-height: 300;
+    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
+        rgba(120, 210, 255, 0.12), transparent);
+}
+
+/* ---------------- 顶部标题栏 ---------------- */
+.title-bar {
+    -fx-background-color: rgba(7, 22, 56, 0.55);
+    -fx-padding: 0 0 0 22;
+    -fx-min-height: 56;
+    -fx-max-height: 56;
+    -fx-alignment: center-left;
+    -fx-spacing: 12;
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.10) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.title-logo {
+    -fx-min-width: 34; -fx-min-height: 34;
+    -fx-max-width: 34; -fx-max-height: 34;
+    -fx-background-radius: 9;
+    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
+}
+.title-logo-text {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.title-text-box { -fx-spacing: 0; }
+.title-main {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14.5px;
+    -fx-font-weight: bold;
+}
+.title-sub {
+    -fx-text-fill: rgba(255, 255, 255, 0.55);
+    -fx-font-size: 9.5px;
+}
+
+.win-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-font-size: 13px;
+    -fx-min-width: 46;
+    -fx-min-height: 56;
+    -fx-max-height: 56;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+.win-btn:hover { -fx-background-color: rgba(255, 255, 255, 0.14); }
+.win-btn:pressed { -fx-background-color: rgba(255, 255, 255, 0.22); }
+.win-close:hover { -fx-background-color: #e81123; -fx-text-fill: white; }
+
+/* ---------------- 左侧品牌区 ---------------- */
+.brand-slogan {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 10, 0.3, 0, 3);
+}
+.brand-desc {
+    -fx-text-fill: rgba(255, 255, 255, 0.75);
+    -fx-font-size: 14px;
+    -fx-line-spacing: 6;
+}
+
+.stat-row { -fx-padding: 14 0 0 0; }
+.stat-chip {
+    -fx-min-width: 128; -fx-min-height: 86;
+    -fx-background-radius: 14;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-border-radius: 14;
+    -fx-border-color: rgba(255, 255, 255, 0.22);
+    -fx-border-width: 1;
+}
+.stat-num {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.stat-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.65);
+    -fx-font-size: 12px;
+}
+
+/* ---------------- 右侧登录卡片 ---------------- */
+.card {
+    -fx-background-radius: 16;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(3, 15, 45, 0.5), 42, 0.2, 0, 20);
+}
+
+.login-avatar {
+    -fx-min-width: 58; -fx-min-height: 58;
+    -fx-max-width: 58; -fx-max-height: 58;
+    -fx-background-radius: 50%;
+    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
+    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.45), 14, 0.3, 0, 5);
+}
+.login-avatar-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.login-title {
+    -fx-text-fill: #1a2c4f;
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 0 0 0;
+}
+.login-sub {
+    -fx-text-fill: #8a94a8;
+    -fx-font-size: 12.5px;
+}
+
+/* ---------------- 表单 ---------------- */
+.field-label {
+    -fx-text-fill: #47536b;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.field {
+    -fx-background-radius: 10;
+    -fx-background-color: #f2f5fa;
+    -fx-border-radius: 10;
+    -fx-border-color: #e3e9f2;
+    -fx-border-width: 1;
+    -fx-padding: 11 14;
+    -fx-spacing: 10;
+}
+.field:focused-within {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #2b7de9;
+    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.28), 10, 0.2, 0, 0);
+}
+
+.field-icon {
+    -fx-min-width: 24; -fx-min-height: 24;
+    -fx-max-width: 24; -fx-max-height: 24;
+    -fx-background-radius: 7;
+    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.field-input {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1a2c4f;
+    -fx-prompt-text-fill: #a5aebf;
+}
+.field-input:focused { -fx-background-color: transparent; }
+
+/* ---------------- 按钮 ---------------- */
+.btn-primary {
+    -fx-background-radius: 10;
+    -fx-background-color: linear-gradient(to right, #3b8bef, #2b7de9);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.4), 12, 0.25, 0, 5);
+}
+.btn-primary:hover { -fx-background-color: linear-gradient(to right, #559bf2, #3b8bef); }
+.btn-primary:pressed {
+    -fx-background-color: linear-gradient(to right, #2f6ec4, #2462c9);
+    -fx-effect: null;
+}
+
+.btn-secondary {
+    -fx-background-radius: 10;
+    -fx-background-color: #eef3fb;
+    -fx-text-fill: #43609b;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 11 0;
+    -fx-cursor: hand;
+    -fx-border-radius: 10;
+    -fx-border-color: #dbe4f2;
+    -fx-border-width: 1;
+}
+.btn-secondary:hover { -fx-background-color: #e2ebf9; -fx-text-fill: #2b5aa0; }
+
+/* ---------------- 版本号 ---------------- */
+.version {
+    -fx-text-fill: rgba(255, 255, 255, 0.55);
+    -fx-font-size: 12px;
+}
