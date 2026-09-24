@@ -1,268 +1,880 @@
 /* ============================================================
-   RMCS 自动测阻机控制系统 - 主控页面样式（JavaFX CSS 语法）
+   RMCS 主控制台 · 双主题（工业深色 / 明亮清爽）
+   通过根节点 styleClass: root-dark / root-light 切换
+   全部颜色使用 looked-up color 变量，组件样式只引用变量
    ============================================================ */
 
-* {
-    -fx-font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+.root-dark {
+    -bg-app: #121418;
+    -bg-panel: #181c24;
+    -bg-sub: #11131a;
+    -bg-input: #12141a;
+    -bg-hover: #1f2635;
+    -border: #2c3342;
+    -border-soft: #262c38;
+    -panel-border: #2c3342;
+    -txt: #e2e8f0;
+    -txt-sec: #94a3b8;
+    -txt-muted: #64748b;
+    -accent: #0078d4;
+    -success: #22c55e;
+    -warning: #f59e0b;
+    -danger: #ef4444;
+    -violet: #8e24aa;
+    -sky: #38bdf8;
+    -shadow: rgba(0,0,0,0.45);
+    -fx-background: -bg-app;
+    -fx-text-base-color: -txt;
+    -fx-font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
 }
 
-.main-root {
-    -fx-background-color: #eef3f9;
+.root-light {
+    -bg-app: #e8edf2;
+    -bg-panel: #ffffff;
+    -bg-sub: #f8fafc;
+    -bg-input: #ffffff;
+    -bg-hover: #f1f5f9;
+    -border: #e2e8f0;
+    -border-soft: #f1f5f9;
+    -panel-border: #bae6fd;
+    -txt: #1e293b;
+    -txt-sec: #64748b;
+    -txt-muted: #94a3b8;
+    -accent: #0078d4;
+    -success: #22c55e;
+    -warning: #f59e0b;
+    -danger: #ef4444;
+    -violet: #8e24aa;
+    -sky: #1565c0;
+    -shadow: rgba(100,116,139,0.22);
+    -fx-background: -bg-app;
+    -fx-text-base-color: -txt;
+    -fx-font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
 }
 
-/* ---------------- 顶部标题栏 ---------------- */
-.app-header {
-    -fx-background-color: #ffffff;
-    -fx-min-height: 54;
-    -fx-max-height: 54;
-    -fx-border-color: transparent transparent #c9dcf2 transparent;
-    -fx-border-width: 0 0 2 0;
-    -fx-padding: 4 16 4 12;
+/* ===== 通用 ===== */
+.bg-app      { -fx-background-color: -bg-app; }
+.bg-card     { -fx-background-color: -bg-panel; }
+.bg-elevated { -fx-background-color: -bg-sub; }
+.bg-input    { -fx-background-color: -bg-input; }
+
+/* ScrollPane：作为右面板容器，去掉默认边框与底色 */
+.scroll-pane { -fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; }
+.scroll-pane .viewport { -fx-background-color: transparent; }
+
+.txt-primary   { -fx-text-fill: -txt; }
+.txt-secondary { -fx-text-fill: -txt-sec; }
+.txt-muted     { -fx-text-fill: -txt-muted; }
+.txt-accent    { -fx-text-fill: -accent; }
+.txt-success   { -fx-text-fill: -success; }
+.txt-warning   { -fx-text-fill: -warning; }
+.txt-danger    { -fx-text-fill: -danger; }
+.txt-violet    { -fx-text-fill: -violet; }
+.txt-amber     { -fx-text-fill: -warning; }
+
+.card {
+    -fx-background-color: -bg-panel;
+    -fx-background-radius: 8;
+    -fx-border-color: -panel-border;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, -shadow, 6, 0, 0, 2);
+}
+/* 应用底：BorderPane/ScrollPane 等 .bg-app 容器——之前缺失，导致容器沿用
+   JavaFX 默认（浅色）背景，黑夜模式下整块面板底仍是白的 */
+.bg-app  { -fx-background-color: -bg-app; }
+.bg-card { -fx-background-color: -bg-panel; }
+/* 面板标题行底部分隔线（原型 border-b） */
+.card-header {
+    -fx-border-color: -border-soft;
+    -fx-border-width: 0 0 1 0;
 }
 
-.app-logo {
-    -fx-min-width: 40; -fx-min-height: 40;
-    -fx-max-width: 40; -fx-max-height: 40;
-    -fx-background-radius: 9;
-    -fx-background-color: linear-gradient(to bottom right, #e5484d, #c62f35);
-    -fx-effect: dropshadow(gaussian, rgba(197, 47, 53, 0.35), 8, 0.25, 0, 3);
-}
-.app-logo-text {
-    -fx-text-fill: white;
-    -fx-font-size: 21px;
-    -fx-font-weight: bold;
-}
-.app-logo-name {
-    -fx-text-fill: #c62f35;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
+.divider {
+    -fx-background-color: -border-soft;
+    -fx-pref-height: 1;
 }
 
-.app-title {
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-alignment: center;
-}
-
-.mode-label {
-    -fx-text-fill: #1d9e4f;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-.user-label {
-    -fx-text-fill: #6b7a90;
-    -fx-font-size: 11.5px;
-}
-.user-name {
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 11.5px;
-    -fx-font-weight: bold;
-}
-
-.btn-power {
-    -fx-min-width: 42; -fx-min-height: 42;
-    -fx-max-width: 42; -fx-max-height: 42;
-    -fx-background-radius: 50%;
-    -fx-background-color: linear-gradient(to bottom right, #e5484d, #c62f35);
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
+/* ===== 按钮 ===== */
+.btn {
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(197, 47, 53, 0.4), 8, 0.25, 0, 3);
-}
-.btn-power:pressed {
-    -fx-background-color: #b02830;
-}
-
-/* ---------------- 全屏按钮 ---------------- */
-.btn-fullscreen {
-    -fx-min-width: 42; -fx-min-height: 42;
-    -fx-max-width: 42; -fx-max-height: 42;
-    -fx-background-radius: 50%;
-    -fx-background-color: linear-gradient(to bottom right, #4f9af3, #2b6fd0);
-    -fx-text-fill: white;
-    -fx-font-size: 17px;
+    -fx-background-radius: 14;
     -fx-font-weight: bold;
+    -fx-font-size: 12;
+    -fx-padding: 7 14 7 14;
+    -fx-border-radius: 14;
+    -fx-min-height: 28;
+}
+/* 核心机台控制按钮：紧凑内边距，保证双行内容完整显示 */
+.btn-core { -fx-padding: 5 6 5 6; }
+.btn-primary  { -fx-background-color: -accent; -fx-text-fill: white; }
+.btn-primary:hover { -fx-background-color: derive(-accent, -15%); }
+.btn-success  { -fx-background-color: -success; -fx-text-fill: white; }
+.btn-success:hover { -fx-background-color: derive(-success, -15%); }
+.btn-warning  { -fx-background-color: -warning; -fx-text-fill: white; }
+.btn-warning:hover { -fx-background-color: derive(-warning, -15%); }
+.btn-danger   { -fx-background-color: -danger; -fx-text-fill: white; }
+.btn-danger:hover { -fx-background-color: derive(-danger, -15%); }
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: -border;
+    -fx-text-fill: -txt;
+}
+.btn-ghost:hover { -fx-background-color: -bg-hover; }
+.btn-ghost:focused {
+    -fx-background-color: -bg-hover;
+    -fx-border-color: -accent;
+    -fx-text-fill: -txt;
+}
+.root-light .btn-ghost { -fx-background-color: white; }
+.root-light .btn-ghost:hover { -fx-background-color: -bg-hover; }
+.root-light .btn-ghost:focused { -fx-background-color: -bg-hover; -fx-border-color: -accent; }
+.root-dark .btn-ghost { -fx-background-color: #181e2b; -fx-border-color: #29364d; -fx-text-fill: #e2e8f0; }
+.root-dark .btn-ghost:hover { -fx-background-color: #1f2635; }
+.root-dark .btn-ghost:focused { -fx-background-color: #1f2635; -fx-border-color: #38bdf8; -fx-text-fill: #e2e8f0; }
+/* 蓝描边主操作按钮（原型「参数设定」样式） */
+.btn-outline-primary {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -accent;
+    -fx-text-fill: -accent;
+}
+.btn-outline-primary:hover { -fx-background-color: -bg-hover; -fx-text-fill: -accent; }
+.btn-outline-primary:focused {
+    -fx-background-color: -bg-hover;
+    -fx-border-color: -accent;
+    -fx-text-fill: -accent;
+    -fx-effect: dropshadow(gaussian, rgba(0,120,212,0.35), 6, 0, 0, 0);
+}
+.root-dark .btn-outline-primary { -fx-background-color: #12141a; -fx-border-color: #0078d4; -fx-text-fill: #38bdf8; }
+.root-dark .btn-outline-primary:hover { -fx-background-color: #1f2635; }
+.root-dark .btn-outline-primary:focused { -fx-background-color: #1f2635; -fx-border-color: #38bdf8; -fx-text-fill: #38bdf8; }
+.root-light .btn-outline-primary { -fx-background-color: #ffffff; -fx-border-color: #0078d4; -fx-text-fill: #0078d4; }
+.root-light .btn-outline-primary:hover { -fx-background-color: #f1f5f9; }
+.root-light .btn-outline-primary:focused { -fx-background-color: #f1f5f9; -fx-border-color: #1565c0; -fx-text-fill: #1565c0; }
+.btn-icon {
+    -fx-background-color: -bg-sub;
+    -fx-border-color: -border;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-text-fill: -txt;
+    -fx-pref-width: 36; -fx-pref-height: 32;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(43, 111, 208, 0.35), 8, 0.25, 0, 3);
 }
-.btn-fullscreen:hover {
-    -fx-background-color: linear-gradient(to bottom right, #66aaf7, #3b8bef);
-}
-.btn-fullscreen:pressed {
-    -fx-background-color: #2462c9;
-}
+.btn-icon:hover { -fx-background-color: -bg-hover; }
 
-/* ---------------- 工作区 ---------------- */
-.work-area { -fx-background-color: transparent; }
+/* ===== 输入控件 ===== */
+/* 注意：combo-box 不加内边距，否则内部文字单元格高度不足导致内容垂直裁剪 */
+.text-field, .combo-box {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-text-fill: -txt;
+    -fx-prompt-text-fill: -txt-muted;
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
+    -fx-font-size: 12;
+}
+.text-field { -fx-padding: 6 10 6 10; }
+.combo-box { -fx-padding: 1 4 1 4; }
+.text-field:focused, .combo-box:focused {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -accent;
+    -fx-text-fill: -txt;
+    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.30), 4, 0, 0, 0);
+}
+/* 兜底：部分环境下变量未继承时，强制按主题显式着色 */
+.root-dark .text-field, .root-dark .combo-box { -fx-background-color: #12141a; -fx-border-color: #2c3342; -fx-text-fill: #e2e8f0; -fx-prompt-text-fill: #64748b; }
+.root-light .text-field, .root-light .combo-box { -fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8; }
+.root-dark .text-field:focused, .root-dark .combo-box:focused { -fx-background-color: #12141a; -fx-border-color: #0078d4; -fx-text-fill: #e2e8f0; }
+.root-light .text-field:focused, .root-light .combo-box:focused { -fx-background-color: #ffffff; -fx-border-color: #0078d4; -fx-text-fill: #1e293b; }
+.combo-box > .list-view { -fx-background-color: -bg-panel; -fx-border-color: -border; }
+.combo-box > .list-view > .list-cell { -fx-background-color: transparent; -fx-text-fill: -txt; }
+.combo-box > .list-view > .list-cell:hover { -fx-background-color: -bg-hover; -fx-text-fill: -txt; }
+.combo-box > .list-view > .list-cell:selected { -fx-background-color: -accent; -fx-text-fill: white; }
+.combo-box .list-cell { -fx-text-fill: -txt; }
+.combo-box .arrow-button { -fx-background-color: transparent; }
+.combo-box .arrow { -fx-background-color: -txt-sec; }
+.combo-box .arrow-button:hover .arrow { -fx-background-color: -accent; }
+/* 兜底：部分环境下变量未继承时，强制按主题显式着色 */
+.root-dark .text-field, .root-dark .combo-box { -fx-background-color: #12141a; -fx-border-color: #2c3342; -fx-text-fill: #e2e8f0; -fx-prompt-text-fill: #64748b; }
+.root-light .text-field, .root-light .combo-box { -fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #94a3b8; }
+/* 下拉弹窗是独立窗口，通过 styleableParent 继承 ComboBox 及上层变量 */
+.combo-box-popup .list-view { -fx-background-color: -bg-panel; -fx-border-color: -border; }
+.combo-box-popup .list-view .list-cell { -fx-background-color: transparent; -fx-text-fill: -txt; }
+.combo-box-popup .list-view .list-cell:hover { -fx-background-color: -bg-hover; -fx-text-fill: -txt; }
+.combo-box-popup .list-view .list-cell:selected { -fx-background-color: -accent; -fx-text-fill: white; }
+/* 兜底：若变量未继承，采用与当前主题一致的显式色 */
+.root-dark .combo-box-popup .list-view { -fx-background-color: #181c24; -fx-border-color: #2c3342; }
+.root-dark .combo-box-popup .list-view .list-cell { -fx-text-fill: #e2e8f0; }
+.root-light .combo-box-popup .list-view { -fx-background-color: #ffffff; -fx-border-color: #e2e8f0; }
+.root-light .combo-box-popup .list-view .list-cell { -fx-text-fill: #1e293b; }
+.check-box { -fx-text-fill: -txt; }
+.check-box .box {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.check-box:selected .box { -fx-background-color: -success; -fx-border-color: -success; }
+.check-box:selected .mark { -fx-background-color: white; }
 
-.panel {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 6;
+/* ===== Badge ===== */
+.badge {
+    -fx-background-radius: 10;
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+}
+.badge-success { -fx-background-color: #22c55e22; -fx-text-fill: -success; }
+.badge-warning { -fx-background-color: #f59e0b22; -fx-text-fill: -warning; }
+.badge-danger  { -fx-background-color: #ef444422; -fx-text-fill: -danger; }
+.badge-info    { -fx-background-color: #3b82f622; -fx-text-fill: -accent; }
+.badge-violet  { -fx-background-color: #8b5cf622; -fx-text-fill: -violet; }
+.badge-running { -fx-background-color: #10b98122; -fx-text-fill: -success; }
+
+/* ===== 矩阵单元 ===== */
+.matrix-cell {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border-soft;
     -fx-border-radius: 6;
-    -fx-border-color: #b9d2ee;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(30, 80, 160, 0.08), 8, 0.2, 0, 2);
-}
-
-.panel-title {
-    -fx-text-fill: #1d7a3e;
-    -fx-font-size: 13.5px;
-    -fx-font-weight: bold;
-    -fx-border-color: transparent transparent transparent #2e9e4f;
-    -fx-border-width: 0 0 0 3;
-    -fx-padding: 1 0 1 8;
-}
-
-/* ---------------- 执行作业表格 ---------------- */
-.cell-head {
-    -fx-background-color: #dbeafe;
-    -fx-border-color: #9dc3e8;
-    -fx-border-width: 1;
-    -fx-background-radius: 2;
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 12.5px;
-    -fx-font-weight: bold;
+    -fx-background-radius: 6;
     -fx-alignment: center;
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 13;
 }
-.cell-blank { -fx-background-color: transparent; }
-
-.row-head {
-    -fx-background-color: #eef2f7;
-    -fx-border-color: #c4d3e4;
-    -fx-border-width: 1;
-    -fx-background-radius: 2;
-    -fx-text-fill: #33445c;
-    -fx-font-size: 12.5px;
+.matrix-cell-pass {
+    -fx-background-color: #10b9811f;
+    -fx-border-color: #10b98166;
+    -fx-text-fill: -success;
+}
+.matrix-cell-fail {
+    -fx-background-color: #ef444422;
+    -fx-border-color: #ef444477;
+    -fx-text-fill: -danger;
+}
+.matrix-cell-active {
+    -fx-background-color: #f59e0b26;
+    -fx-border-color: -warning;
+    -fx-text-fill: -warning;
+    -fx-effect: dropshadow(gaussian, rgba(245,158,11,0.45), 6, 0, 0, 0);
+}
+.matrix-cell-dash {
+    -fx-text-fill: -txt-muted;
+}
+/* 行号 / 列头（原型配色） */
+.matrix-head {
+    -fx-background-color: #13161c;
+    -fx-border-color: #262c3a;
+    -fx-alignment: center;
     -fx-font-weight: bold;
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 12;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+}
+.root-light .matrix-head {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-text-fill: #475569;
+}
+.matrix-col-head {
+    -fx-background-color: #1e2638;
+    -fx-border-color: #313f5c;
+    -fx-text-fill: #38bdf8;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
     -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 12;
+}
+.root-light .matrix-col-head {
+    -fx-background-color: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+    -fx-border-color: #90caf9;
+    -fx-text-fill: #1565c0;
+}
+/* 单元格明暗双主题（原型：亮色合格=浅蓝、超差=浅玫红） */
+.root-light .matrix-cell-pass {
+    -fx-background-color: #f0f9ff;
+    -fx-border-color: #bae6fd;
+    -fx-text-fill: #1e293b;
+}
+.matrix-cell-fail {
+    -fx-background-color: #4c051966;
+    -fx-border-color: #f43f5eb3;
+    -fx-text-fill: #fb7185;
+}
+.root-light .matrix-cell-fail {
+    -fx-background-color: #fff1f2;
+    -fx-border-color: #fecdd3;
+    -fx-text-fill: #be123c;
+}
+.root-light .matrix-cell-active {
+    -fx-background-color: #fffbeb;
+    -fx-border-color: #fbbf24;
+    -fx-text-fill: #92400e;
 }
 
-.cell {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #9dc3e8;
-    -fx-border-width: 1;
-    -fx-background-radius: 2;
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 12.5px;
-    -fx-alignment: center;
-}
-.cell-empty { -fx-text-fill: #a8b3c2; }
-
-/* ---------------- 数据履历表格 ---------------- */
+/* ===== 表格 ===== */
 .table-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c4d8ef;
-    -fx-border-width: 1;
-    -fx-background-radius: 2;
+    -fx-background-color: transparent;
+    -fx-border-color: -border;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
 }
-.table-view .column-header-background {
-    -fx-background-color: #eaf2fc;
-    -fx-background-insets: 0;
-    -fx-max-height: 30;
+.table-view > .column-header-background {
+    -fx-background-color: -bg-sub;
+    -fx-background-radius: 8 8 0 0;
 }
-.table-view .column-header {
-    -fx-background-color: #eaf2fc;
-    -fx-background-insets: 0;
-    -fx-size: 30;
+.table-view > .column-header-background > .nested-column-header,
+.table-view > .column-header-background > .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: -border-soft;
 }
-.table-view .column-header .label {
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 12.5px;
+.table-view > .column-header-background > .column-header .label {
+    -fx-text-fill: -txt-sec;
     -fx-font-weight: bold;
-    -fx-alignment: center;
+}
+.root-dark .table-view > .column-header-background > .column-header .label { -fx-text-fill: #94a3b8; }
+.root-light .table-view > .column-header-background > .column-header .label { -fx-text-fill: #64748b; }
+.table-view .filler { -fx-background-color: -bg-sub; }
+.table-view .table-cell { -fx-border-color: -border-soft; -fx-text-fill: -txt; -fx-padding: 6 8 6 8; }
+.table-view .table-row-cell { -fx-background-color: transparent; }
+.table-view .table-row-cell:odd { -fx-background-color: -bg-sub; }
+.table-view .table-row-cell:selected { -fx-background-color: #3b82f633; }
+.table-view .scroll-bar:vertical > .thumb { -fx-background-color: -border; -fx-background-radius: 3; }
+.table-view .scroll-bar:vertical > .track { -fx-background-color: transparent; }
+
+/* ===== Card 标题 ===== */
+.card-title {
+    -fx-text-fill: -txt;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+.card-title-stripe {
+    -fx-background-color: -success;
+    -fx-pref-width: 3;
+    -fx-min-width: 3;
+}
+.card-subtitle {
+    -fx-text-fill: -txt-sec;
+    -fx-font-size: 11;
+}
+.card-header {
+    -fx-background-color: -bg-panel;
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 10 14 10 14;
 }
 
-.table-view .table-row-cell {
-    -fx-background-insets: 0;
+/* ===== 日志 ===== */
+.list-view.log-list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -border;
+    -fx-background-radius: 0 0 10 10;
+    -fx-border-radius: 0 0 10 10;
+}
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -txt;
+    -fx-padding: 4 10 4 10;
+}
+.root-dark .list-view .list-cell { -fx-text-fill: #e2e8f0; }
+.root-light .list-view .list-cell { -fx-text-fill: #1e293b; }
+.list-view .list-cell:odd { -fx-background-color: -bg-sub; }
+
+.log-line { -fx-font-family: 'Consolas'; -fx-font-size: 11; }
+/* 分类着色：时间戳灰、标签与内容按类型（TextFlow 内 Text 节点用 -fx-fill） */
+.log-line .log-time { -fx-fill: #64748b; }
+.log-line .log-msg  { -fx-fill: #e2e8f0; }
+.log-line .log-tag  { -fx-font-weight: bold; }
+.log-info    .log-tag { -fx-fill: #38bdf8; }
+.log-plc     .log-tag { -fx-fill: #a78bfa; }
+.log-com     .log-tag { -fx-fill: #22d3ee; }
+.log-success .log-tag { -fx-fill: #4ade80; }
+.log-warning .log-tag { -fx-fill: #fbbf24; }
+.log-error   .log-tag { -fx-fill: #f87171; }
+.log-plc     .log-msg { -fx-fill: #93c5fd; }
+.log-com     .log-msg { -fx-fill: #93c5fd; }
+.log-success .log-msg { -fx-fill: #4ade80; }
+.log-warning .log-msg { -fx-fill: #fbbf24; }
+.log-error   .log-msg { -fx-fill: #f87171; }
+.root-light .log-line .log-time { -fx-fill: #94a3b8; }
+.root-light .log-line .log-msg  { -fx-fill: #1e293b; }
+.root-light .log-info    .log-tag { -fx-fill: #0284c7; }
+.root-light .log-plc     .log-tag { -fx-fill: #7c3aed; }
+.root-light .log-com     .log-tag { -fx-fill: #0891b2; }
+.root-light .log-success .log-tag { -fx-fill: #16a34a; }
+.root-light .log-warning .log-tag { -fx-fill: #d97706; }
+.root-light .log-error   .log-tag { -fx-fill: #dc2626; }
+.root-light .log-plc     .log-msg { -fx-fill: #2563eb; }
+.root-light .log-com     .log-msg { -fx-fill: #2563eb; }
+.root-light .log-success .log-msg { -fx-fill: #16a34a; }
+.root-light .log-warning .log-msg { -fx-fill: #d97706; }
+.root-light .log-error   .log-msg { -fx-fill: #dc2626; }
+/* 原型：日志面板标题前的终端提示符 >_ */
+.log-prompt {
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: #38bdf8;
+}
+.root-light .log-prompt { -fx-text-fill: #0284c7; }
+.log-info    .label { -fx-text-fill: -txt; }
+.log-info    .log-tag { -fx-text-fill: -accent; -fx-font-weight: bold; }
+.log-plc     .label { -fx-text-fill: -txt; }
+.log-plc     .log-tag { -fx-text-fill: -violet; -fx-font-weight: bold; }
+.log-com     .label { -fx-text-fill: -txt; }
+.log-com     .log-tag { -fx-text-fill: #22d3ee; -fx-font-weight: bold; }
+.log-success .label { -fx-text-fill: -success; }
+.log-success .log-tag { -fx-text-fill: -success; -fx-font-weight: bold; }
+.log-warning .label { -fx-text-fill: -warning; }
+.log-warning .log-tag { -fx-text-fill: -warning; -fx-font-weight: bold; }
+.log-error   .label { -fx-text-fill: -danger; }
+.log-error   .log-tag { -fx-text-fill: -danger; -fx-font-weight: bold; }
+
+/* ===== Modal ===== */
+.modal-overlay {
+    -fx-background-color: rgba(8,11,18,0.78);
+}
+.root-light.modal-overlay { -fx-background-color: rgba(148,163,184,0.45); }
+.modal-card {
+    -fx-background-color: -bg-panel;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, -shadow, 24, 0, 0, 8);
+}
+
+/* ===== Header ===== */
+.app-header {
+    -fx-background-color: -bg-panel;
+    -fx-border-color: -border-soft;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 14 8 14;
+    -fx-spacing: 10;
+    -fx-effect: dropshadow(gaussian, -shadow, 4, 0, 0, 2);
+}
+.brand-block {
+    -fx-background-color: #e639461f;
+    -fx-border-color: #e6394655;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 4 12 4 6;
+    -fx-spacing: 8;
+}
+.brand-block .label { -fx-text-fill: -txt; }
+.brand-name { -fx-font-size: 16; -fx-letter-spacing: 2; -fx-text-fill: #e63946; -fx-font-weight: bold; }
+.brand-sub  { -fx-font-size: 10; -fx-text-fill: -txt-sec; -fx-font-family: 'Consolas'; }
+.brand-logo {
+    -fx-background-color: #e63946;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-pref-width: 28; -fx-pref-height: 28;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+    -fx-effect: dropshadow(gaussian, rgba(230,57,70,0.4), 6, 0, 0, 0);
+}
+/* 顶部居中大标题 */
+.header-title {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-text-fill: -txt;
+}
+.header-version {
+    -fx-font-size: 11;
+    -fx-text-fill: -accent;
+    -fx-font-family: 'Consolas';
+    -fx-font-weight: bold;
+}
+/* 红色圆形电源按钮（原型样式） */
+.btn-power {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-background-radius: 17;
+    -fx-border-radius: 17;
+    -fx-min-width: 34;
+    -fx-pref-width: 34;
+    -fx-min-height: 34;
+    -fx-pref-height: 34;
+    -fx-font-size: 15;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+}
+.btn-power:hover { -fx-background-color: #b71c1c; }
+/* 圆形图标按钮组（原型：全屏蓝、主题浅灰、电源红） */
+.btn-circle {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-min-width: 32;
+    -fx-pref-width: 32;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-font-size: 13;
+    -fx-cursor: hand;
+    -fx-alignment: center;
     -fx-padding: 0;
 }
-.table-view .table-row-cell:odd { -fx-background-color: #f7fafd; }
-.table-view .table-row-cell:selected { -fx-background-color: #cfe4fb; }
+.btn-circle-blue {
+    -fx-background-color: #0078d4;
+    -fx-text-fill: white;
+}
+.btn-circle-blue:hover { -fx-background-color: #0063b1; }
+.btn-circle-ghost {
+    -fx-background-color: #252c3b;
+    -fx-border-color: #384357;
+    -fx-text-fill: #fcd34d;
+}
+.root-light .btn-circle-ghost {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #cbd5e1;
+    -fx-text-fill: #334155;
+}
+.btn-circle-ghost:hover { -fx-background-color: #31394c; }
+.root-light .btn-circle-ghost:hover { -fx-background-color: #e2e8f0; }
+/* 偏差小块（标准卡右上角，黄底） */
+.dev-chip {
+    -fx-background-color: #fef9c3;
+    -fx-background-radius: 8;
+    -fx-padding: 4 10 4 10;
+    -fx-spacing: 12;
+    -fx-min-width: 128;
+    -fx-alignment: center-right;
+}
+.dev-label { -fx-text-fill: -txt-sec; -fx-font-size: 11; }
+.dev-value { -fx-font-size: 12; -fx-font-weight: bold; }
 
-.table-view .table-cell {
-    -fx-text-fill: #33445c;
-    -fx-font-size: 12.5px;
+/* 模式切换按钮（原型：透明底 + 绿/橙字） */
+.mode-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-padding: 0 2 0 2;
+}
+.mode-auto { -fx-text-fill: #4ade80; }
+.mode-manual { -fx-text-fill: #fbbf24; }
+.root-light .mode-auto { -fx-text-fill: #2e7d32; }
+.root-light .mode-manual { -fx-text-fill: #f57c00; }
+.brand-industrial {
+    -fx-font-size: 9;
+    -fx-text-fill: -txt-muted;
+    -fx-font-family: 'Consolas';
+}
+
+.footer-clock {
+    -fx-background-color: #12151b;
+    -fx-text-fill: #38bdf8;
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-border-color: #252d3d;
+    -fx-border-radius: 4;
+    -fx-padding: 1 6 1 6;
+}
+.root-light .footer-clock {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
+    -fx-border-color: transparent;
+}
+
+.header-tag {
+    -fx-background-color: -bg-sub;
+    -fx-border-color: -border;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-padding: 4 10 4 10;
+    -fx-spacing: 6;
     -fx-alignment: center;
-    -fx-padding: 0 6 0 6;
 }
-.table-view .table-row-cell:selected .table-cell { -fx-text-fill: #10233f; }
-.table-view .placeholder { -fx-background-color: #ffffff; }
-.table-view .placeholder .label { -fx-text-fill: #8a97a8; }
+.header-tag .label { -fx-text-fill: -txt-sec; -fx-font-size: 11; }
 
-/* ---------------- 动作履历 ---------------- */
-.action-log {
-    -fx-control-inner-background: #ffffff;
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #33445c;
-    -fx-font-size: 13px;
-    -fx-highlight-fill: #cfe4fb;
-    -fx-border-color: #dde7f3;
-    -fx-border-width: 1;
-    -fx-background-radius: 2;
-}
-.action-log .content {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 2;
-}
-
-/* ---------------- 右侧面板 ---------------- */
-.side-label {
-    -fx-text-fill: #6b7a90;
-    -fx-font-size: 12.5px;
-}
-.side-value {
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 12.5px;
-    -fx-font-weight: bold;
-}
-
-.btn-param {
-    -fx-background-color: linear-gradient(to bottom, #3b8bef, #2b7de9);
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 4;
-    -fx-padding: 5 12;
-    -fx-cursor: hand;
-}
-.btn-param:hover { -fx-background-color: linear-gradient(to bottom, #4f9af3, #3b8bef); }
-.btn-param:pressed { -fx-background-color: #2462c9; }
-
-/* ---------------- 人员操作大按钮 ---------------- */
-.op-btn {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 14.5px;
-    -fx-font-weight: bold;
-    -fx-min-height: 56;
-    -fx-background-radius: 4;
-    -fx-background-insets: 0;
-    -fx-cursor: hand;
-}
-.op-btn:hover { -fx-opacity: 0.88; }
-.op-btn:pressed { -fx-opacity: 0.75; }
-
-.op-stop   { -fx-background-color: linear-gradient(to bottom, #ee5353, #d63a3a); }
-.op-gray   { -fx-background-color: linear-gradient(to bottom, #7d8b99, #64717e); }
-.op-start  { -fx-background-color: linear-gradient(to bottom, #47b355, #359a44); }
-.op-blue   { -fx-background-color: linear-gradient(to bottom, #3b8bef, #2b6fd0); }
-.op-orange { -fx-background-color: linear-gradient(to bottom, #f5a13c, #e08615); }
-.op-purple { -fx-background-color: linear-gradient(to bottom, #9d4ed6, #7e3ab8); }
-
-/* ---------------- 底部状态栏 ---------------- */
-.status-bar {
-    -fx-background-color: #cfe6fb;
-    -fx-min-height: 32;
-    -fx-max-height: 32;
-    -fx-border-color: #a9cdee transparent transparent transparent;
+/* ===== Footer ===== */
+.app-footer {
+    -fx-background-color: -bg-panel;
+    -fx-border-color: -border-soft;
     -fx-border-width: 1 0 0 0;
+    -fx-padding: 4 14 4 14;
+    -fx-spacing: 10;
 }
-.status-ok {
-    -fx-text-fill: #1d7a3e;
-    -fx-font-size: 12.5px;
+.app-footer .label { -fx-text-fill: -txt-sec; -fx-font-size: 11; }
+.footer-status-pill {
+    -fx-background-radius: 10;
+    -fx-padding: 2 8 2 8;
+    -fx-font-size: 10;
     -fx-font-weight: bold;
 }
-.status-text {
-    -fx-text-fill: #2a3c55;
-    -fx-font-size: 12.5px;
+.footer-status-online  { -fx-background-color: #22c55e22; -fx-text-fill: -success; }
+.footer-status-offline { -fx-background-color: #ef444422; -fx-text-fill: -danger; }
+
+/* ===== SplitPane ===== */
+.split-pane > .split-pane-divider {
+    -fx-background-color: -border-soft;
+    -fx-padding: 0 1 0 1;
+}
+
+/* ===== ScrollBar ===== */
+.scroll-bar:vertical > .thumb,
+.scroll-bar:horizontal > .thumb {
+    -fx-background-color: -border;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical > .track,
+.scroll-bar:horizontal > .track {
+    -fx-background-color: transparent;
+}
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+
+/* ===== 原型：图标块 / 小卡 / 数值 / 组头 / 操作按钮 ===== */
+.icon-block {
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-min-width: 20;
+    -fx-min-height: 20;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-alignment: center;
+}
+.icon-glyph { -fx-font-size: 11; -fx-font-weight: bold; }
+.icon-sky     { -fx-background-color: #0ea5e91f; -fx-border-color: #0ea5e94d; }
+.icon-sky     .icon-glyph { -fx-text-fill: #38bdf8; }
+.icon-emerald { -fx-background-color: #10b9811f; -fx-border-color: #10b9814d; }
+.icon-emerald .icon-glyph { -fx-text-fill: #34d399; }
+.icon-purple  { -fx-background-color: #8e24aa1f; -fx-border-color: #8e24aa4d; }
+.icon-purple  .icon-glyph { -fx-text-fill: #c084fc; }
+.icon-blue    { -fx-background-color: #0078d41f; -fx-border-color: #0078d44d; }
+.icon-blue    .icon-glyph { -fx-text-fill: #38bdf8; }
+
+.small-card {
+    -fx-background-color: #11131a;
+    -fx-border-color: -border-soft;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 8 6 8;
+    -fx-min-height: 52;
+}
+.root-light .small-card {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+}
+.mini-label { -fx-font-size: 10; -fx-text-fill: -txt-sec; }
+.root-dark .mini-label { -fx-text-fill: #cbd5e1; }
+.mini-mono  { -fx-font-size: 10; -fx-text-fill: -txt-sec; -fx-font-family: 'Consolas'; }
+.big-value {
+    -fx-font-size: 22;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0ea5e9;
+    -fx-font-family: 'Consolas';
+}
+.root-light .big-value { -fx-text-fill: #0078d4; }
+.mid-value {
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0ea5e9;
+    -fx-font-family: 'Consolas';
+}
+.root-light .mid-value { -fx-text-fill: #0078d4; }
+.unit-label { -fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: -txt-sec; }
+.range-value {
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Consolas';
+    -fx-text-fill: #34d399;
+}
+.root-light .range-value { -fx-text-fill: #059669; }
+.group-head { -fx-font-size: 10; -fx-font-weight: bold; -fx-text-fill: -txt-sec; -fx-font-family: 'Consolas'; }
+
+.op-btn {
+    -fx-background-color: #181e2b;
+    -fx-border-color: #29364d;
+    -fx-text-fill: #e2e8f0;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-padding: 4 0 4 0;
+    -fx-cursor: hand;
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+    -fx-alignment: center;
+    -fx-content-display: graphic-only;
+}
+/* 操作按钮：整个按钮底色即彩色区域（点击范围与颜色一致） */
+.op-btn-sky    { -fx-background-color: #38bdf81f; -fx-border-color: #38bdf84d; }
+.op-btn-amber  { -fx-background-color: #fbbf241f; -fx-border-color: #fbbf244d; }
+.op-btn-purple { -fx-background-color: #a78bfa1f; -fx-border-color: #a78bfa4d; }
+.root-light .op-btn {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-text-fill: #1e293b;
+}
+.root-dark .op-btn {
+    -fx-background-color: #181e2b;
+    -fx-border-color: #29364d;
+    -fx-text-fill: #e2e8f0;
+}
+.op-btn:hover { -fx-background-color: #1f2635; -fx-border-color: #38bdf8; -fx-text-fill: #38bdf8; }
+.op-btn:focused {
+    -fx-background-color: #1f2635;
+    -fx-border-color: #38bdf8;
+    -fx-text-fill: #38bdf8;
+    -fx-effect: dropshadow(gaussian, rgba(56,189,248,0.35), 6, 0, 0, 0);
+}
+.root-light .op-btn:hover { -fx-background-color: #e2e8f0; -fx-text-fill: #1565c0; }
+.root-light .op-btn:focused { -fx-background-color: #e2e8f0; -fx-border-color: #0078d4; -fx-text-fill: #0078d4; }
+.op-icon {
+    -fx-pref-width: 26; -fx-pref-height: 26; -fx-min-width: 26; -fx-min-height: 26;
+    -fx-background-radius: 13; -fx-alignment: center;
+}
+/* 实色圆形底 + 白色图标（原型样式） */
+.op-icon-sky    { -fx-background-color: #38bdf8; }
+.op-icon-amber  { -fx-background-color: #fbbf24; }
+.op-icon-purple { -fx-background-color: #a78bfa; }
+.op-icon > .label { -fx-text-fill: white; -fx-font-size: 12; }
+.op-label { -fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: -txt; }
+
+/* 核心机台控制按钮（原型：主标签 + 英文副标签 双行） */
+.btn .core-glyph { -fx-font-size: 13; -fx-font-weight: bold; }
+.core-title { -fx-font-size: 13; -fx-font-weight: bold; }
+.core-sub   { -fx-font-size: 8;  -fx-font-weight: bold; }
+.btn-success .core-glyph { -fx-text-fill: white; }
+.btn-success .core-title { -fx-text-fill: white; }
+.btn-success .core-sub   { -fx-text-fill: #bbf7d0; }
+.btn-danger  .core-glyph { -fx-text-fill: white; }
+.btn-danger  .core-title { -fx-text-fill: white; }
+.btn-danger  .core-sub   { -fx-text-fill: #fecaca; }
+.btn-ghost   .core-glyph { -fx-text-fill: #0078d4; }
+.btn-ghost   .core-title { -fx-text-fill: #1e293b; }
+.btn-ghost   .core-sub   { -fx-text-fill: #64748b; }
+.root-dark .btn-ghost .core-glyph { -fx-text-fill: #38bdf8; }
+.root-dark .btn-ghost .core-title { -fx-text-fill: #e2e8f0; }
+.root-dark .btn-ghost .core-sub   { -fx-text-fill: #94a3b8; }
+
+/* 日志分段筛选按钮组 */
+.seg-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -txt-sec;
+    -fx-font-size: 11;
+    -fx-cursor: hand;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 4;
+}
+.seg-btn:hover { -fx-text-fill: -txt; }
+.seg-btn:selected {
+    -fx-background-color: #0078d4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.seg-group {
+    -fx-background-color: #11141b;
+    -fx-border-color: #262e3d;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 2;
+}
+.root-light .seg-group {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #e2e8f0;
+}
+
+/* ===== 模态弹窗蓝色标题栏（原型样式，Stage 为 UNDECORATED） ===== */
+.dlg-titlebar {
+    -fx-background-color: linear-gradient(to right, #005a9e, #0078d4);
+    -fx-padding: 10 14 10 14;
+    -fx-spacing: 8;
+    -fx-background-radius: 12 12 0 0;
+    -fx-cursor: move;
+}
+.dlg-titlebar .label { -fx-text-fill: white; }
+.dlg-title-icon { -fx-font-size: 14; -fx-font-weight: bold; }
+.dlg-title { -fx-font-size: 14; -fx-font-weight: bold; }
+.dlg-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 4;
+}
+.dlg-close:hover { -fx-background-color: #e63946; }
+/* 分节标题（参数设定弹窗） */
+.section-head {
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: -txt;
+    -fx-border-color: -border-soft;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 0 6 0;
+}
+
+/* ===== 间隔档位按钮组（原型样式） ===== */
+.interval-chip {
+    -fx-cursor: hand;
+    -fx-background-color: -bg-sub;
+    -fx-border-color: -border;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-text-fill: -txt-sec;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-padding: 6 4 6 4;
+    -fx-alignment: center;
+    -fx-content-display: top;
+}
+.interval-chip:hover { -fx-background-color: -bg-hover; -fx-text-fill: -txt; }
+.interval-chip:selected {
+    -fx-background-color: -accent;
+    -fx-border-color: -accent;
+    -fx-text-fill: white;
+}
+.interval-chip:focused {
+    -fx-background-color: -bg-hover;
+    -fx-border-color: -accent;
+    -fx-text-fill: -txt;
+    -fx-effect: dropshadow(gaussian, rgba(0,120,212,0.35), 4, 0, 0, 0);
+}
+.root-dark .interval-chip { -fx-background-color: #11131a; -fx-border-color: #2c3342; -fx-text-fill: #cbd5e1; }
+.root-dark .interval-chip:hover { -fx-background-color: #1f2635; -fx-text-fill: #e2e8f0; }
+.root-dark .interval-chip:selected { -fx-background-color: #0078d4; -fx-text-fill: white; }
+.root-dark .interval-chip:focused { -fx-background-color: #1f2635; -fx-border-color: #38bdf8; -fx-text-fill: #e2e8f0; }
+.root-light .interval-chip { -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-text-fill: #64748b; }
+.root-light .interval-chip:hover { -fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; }
+.root-light .interval-chip:selected { -fx-background-color: #0078d4; -fx-text-fill: white; }
+.root-light .interval-chip:focused { -fx-background-color: #e2e8f0; -fx-border-color: #0078d4; -fx-text-fill: #1e293b; }
+.chip-sub { -fx-font-size: 9; -fx-font-weight: normal; }
+
+/* ===== iOS 风格开关（自动获取数据） ===== */
+.check-box.switch {
+    -fx-text-fill: -txt;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.check-box.switch .box {
+    -fx-background-color: #cbd5e1;
+    -fx-border-color: transparent;
+    -fx-background-radius: 11;
+    -fx-min-width: 40;
+    -fx-pref-width: 40;
+    -fx-min-height: 22;
+    -fx-pref-height: 22;
+}
+.check-box.switch .mark {
+    -fx-background-color: white;
+    -fx-min-width: 15;
+    -fx-pref-width: 15;
+    -fx-min-height: 15;
+    -fx-pref-height: 15;
+    -fx-background-radius: 8;
+    -fx-translate-x: -10;
+    -fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+}
+.check-box.switch:selected .box {
+    -fx-background-color: #10b981;
+    -fx-border-color: transparent;
+}
+.check-box.switch:selected .mark {
+    -fx-background-color: white;
+    -fx-translate-x: 10;
 }

@@ -1,231 +1,191 @@
-/* ============================================================
-   RMCS 测阻机控制系统 - 登录页样式（JavaFX CSS 语法）
+﻿/* ============================================================
+   RMCS 登录页 · 原型风格（左蓝品牌区 + 右白表单区）
    ============================================================ */
 
-* {
-    -fx-font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+.login-root {
+    -fx-background-color: #f4f7fb;
+    -fx-font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
 }
 
-/* ---------------- 根容器：深蓝渐变背景 ---------------- */
-.root {
-    -fx-background-color: linear-gradient(to bottom right, #0b2450, #163e86, #2a63c4);
+/* ===== 左侧品牌区 ===== */
+.brand-side {
+    -fx-background-color: linear-gradient(to bottom right, #1e5fd6, #3b82f6);
+    -fx-min-width: 320;
 }
-
-/* ---------------- 背景装饰光斑 ---------------- */
-.deco {
-    -fx-background-radius: 50%;
+.version-pill {
+    -fx-background-color: rgba(255,255,255,0.16);
+    -fx-border-color: rgba(255,255,255,0.45);
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 5 14 5 14;
 }
-.deco-1 {
-    -fx-min-width: 460; -fx-min-height: 460;
-    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
-        rgba(255, 255, 255, 0.14), transparent);
-}
-.deco-2 {
-    -fx-min-width: 520; -fx-min-height: 520;
-    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
-        rgba(96, 181, 255, 0.20), transparent);
-}
-.deco-3 {
-    -fx-min-width: 380; -fx-min-height: 380;
-    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
-        rgba(255, 255, 255, 0.08), transparent);
-}
-.deco-4 {
-    -fx-min-width: 300; -fx-min-height: 300;
-    -fx-background-color: radial-gradient(center 50% 50%, radius 50%,
-        rgba(120, 210, 255, 0.12), transparent);
-}
-
-/* ---------------- 顶部标题栏 ---------------- */
-.title-bar {
-    -fx-background-color: rgba(7, 22, 56, 0.55);
-    -fx-padding: 0 0 0 22;
-    -fx-min-height: 56;
-    -fx-max-height: 56;
-    -fx-alignment: center-left;
-    -fx-spacing: 12;
-    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.10) transparent;
-    -fx-border-width: 0 0 1 0;
-}
-
-.title-logo {
-    -fx-min-width: 34; -fx-min-height: 34;
-    -fx-max-width: 34; -fx-max-height: 34;
-    -fx-background-radius: 9;
-    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
-}
-.title-logo-text {
+.version-pill .label {
     -fx-text-fill: white;
-    -fx-font-size: 18px;
+    -fx-font-size: 12;
     -fx-font-weight: bold;
 }
-
-.title-text-box { -fx-spacing: 0; }
-.title-main {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 14.5px;
+.brand-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30;
     -fx-font-weight: bold;
-}
-.title-sub {
-    -fx-text-fill: rgba(255, 255, 255, 0.55);
-    -fx-font-size: 9.5px;
-}
-
-.win-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: rgba(255, 255, 255, 0.85);
-    -fx-font-size: 13px;
-    -fx-min-width: 46;
-    -fx-min-height: 56;
-    -fx-max-height: 56;
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-    -fx-border-width: 0;
-    -fx-cursor: hand;
-}
-.win-btn:hover { -fx-background-color: rgba(255, 255, 255, 0.14); }
-.win-btn:pressed { -fx-background-color: rgba(255, 255, 255, 0.22); }
-.win-close:hover { -fx-background-color: #e81123; -fx-text-fill: white; }
-
-/* ---------------- 左侧品牌区 ---------------- */
-.brand-slogan {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 36px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 10, 0.3, 0, 3);
 }
 .brand-desc {
-    -fx-text-fill: rgba(255, 255, 255, 0.75);
-    -fx-font-size: 14px;
-    -fx-line-spacing: 6;
+    -fx-text-fill: #dbeafe;
+    -fx-font-size: 13;
 }
-
-.stat-row { -fx-padding: 14 0 0 0; }
-.stat-chip {
-    -fx-min-width: 128; -fx-min-height: 86;
-    -fx-background-radius: 14;
-    -fx-background-color: rgba(255, 255, 255, 0.12);
-    -fx-border-radius: 14;
-    -fx-border-color: rgba(255, 255, 255, 0.22);
-    -fx-border-width: 1;
-}
-.stat-num {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-}
-.stat-label {
-    -fx-text-fill: rgba(255, 255, 255, 0.65);
-    -fx-font-size: 12px;
-}
-
-/* ---------------- 右侧登录卡片 ---------------- */
-.card {
-    -fx-background-radius: 16;
-    -fx-background-color: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(3, 15, 45, 0.5), 42, 0.2, 0, 20);
-}
-
-.login-avatar {
-    -fx-min-width: 58; -fx-min-height: 58;
-    -fx-max-width: 58; -fx-max-height: 58;
-    -fx-background-radius: 50%;
-    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
-    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.45), 14, 0.3, 0, 5);
-}
-.login-avatar-icon {
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-.login-title {
-    -fx-text-fill: #1a2c4f;
-    -fx-font-size: 23px;
-    -fx-font-weight: bold;
-    -fx-padding: 14 0 0 0;
-}
-.login-sub {
-    -fx-text-fill: #8a94a8;
-    -fx-font-size: 12.5px;
-}
-
-/* ---------------- 表单 ---------------- */
-.field-label {
-    -fx-text-fill: #47536b;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-.field {
+.diag-item {
+    -fx-background-color: rgba(255,255,255,0.14);
     -fx-background-radius: 10;
-    -fx-background-color: #f2f5fa;
-    -fx-border-radius: 10;
-    -fx-border-color: #e3e9f2;
-    -fx-border-width: 1;
-    -fx-padding: 11 14;
-    -fx-spacing: 10;
+    -fx-padding: 10 14 10 14;
 }
-.field:focused-within {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #2b7de9;
-    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.28), 10, 0.2, 0, 0);
+.diag-dot {
+    -fx-background-color: #34d399;
+    -fx-pref-width: 8; -fx-min-width: 8;
+    -fx-pref-height: 8; -fx-min-height: 8;
+    -fx-background-radius: 4;
 }
-
-.field-icon {
-    -fx-min-width: 24; -fx-min-height: 24;
-    -fx-max-width: 24; -fx-max-height: 24;
-    -fx-background-radius: 7;
-    -fx-background-color: linear-gradient(to bottom right, #4facfe, #2b7de9);
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
+.diag-title {
+    -fx-text-fill: white;
+    -fx-font-size: 13;
     -fx-font-weight: bold;
-    -fx-alignment: center;
+}
+.diag-sub {
+    -fx-text-fill: #bfdbfe;
+    -fx-font-size: 11;
+}
+.diag-check {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+.copyright {
+    -fx-text-fill: #bfdbfe;
+    -fx-font-size: 11;
 }
 
+/* ===== 右侧表单区 ===== */
+.form-side {
+    -fx-background-color: white;
+    -fx-border-color: #e5eaf1;
+    -fx-border-width: 0 0 0 1;
+}
+.eyebrow-icon {
+    -fx-text-fill: #2563eb;
+    -fx-font-size: 14;
+}
+.form-eyebrow {
+    -fx-text-fill: #2563eb;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+}
+.form-title {
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+}
+.form-sub {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12;
+}
+.form-label {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+}
+
+/* 输入框容器（带图标） */
+.field-wrap {
+    -fx-background-color: white;
+    -fx-border-color: #dbe3ec;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 4 12 4 12;
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+}
+.field-icon {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13;
+}
 .field-input {
     -fx-background-color: transparent;
-    -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 14;
+    -fx-min-height: 34;
+    -fx-pref-height: 34;
     -fx-padding: 0;
-    -fx-font-size: 14px;
-    -fx-text-fill: #1a2c4f;
-    -fx-prompt-text-fill: #a5aebf;
 }
-.field-input:focused { -fx-background-color: transparent; }
-
-/* ---------------- 按钮 ---------------- */
-.btn-primary {
-    -fx-background-radius: 10;
-    -fx-background-color: linear-gradient(to right, #3b8bef, #2b7de9);
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-padding: 12 0;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(43, 125, 233, 0.4), 12, 0.25, 0, 5);
-}
-.btn-primary:hover { -fx-background-color: linear-gradient(to right, #559bf2, #3b8bef); }
-.btn-primary:pressed {
-    -fx-background-color: linear-gradient(to right, #2f6ec4, #2462c9);
+.field-input:focused {
+    -fx-border-color: transparent;
     -fx-effect: null;
+    -fx-background-color: transparent;
 }
-
-.btn-secondary {
-    -fx-background-radius: 10;
-    -fx-background-color: #eef3fb;
-    -fx-text-fill: #43609b;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-padding: 11 0;
+.eye-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14;
     -fx-cursor: hand;
-    -fx-border-radius: 10;
-    -fx-border-color: #dbe4f2;
-    -fx-border-width: 1;
+    -fx-padding: 4 6 4 6;
 }
-.btn-secondary:hover { -fx-background-color: #e2ebf9; -fx-text-fill: #2b5aa0; }
+.eye-btn:hover { -fx-text-fill: #2563eb; }
 
-/* ---------------- 版本号 ---------------- */
-.version {
-    -fx-text-fill: rgba(255, 255, 255, 0.55);
-    -fx-font-size: 12px;
+/* 初始凭证条 */
+.quick-fill {
+    -fx-background-color: #f6f8fb;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12 8 12;
+}
+.quick-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 12;
+}
+.code-text {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #b45309;
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 1 6 1 6;
+}
+.link-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2563eb;
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 2 6 2 6;
+}
+.link-btn:hover { -fx-text-fill: #1d4ed8; }
+
+/* 登录大按钮 */
+.btn-login {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-cursor: hand;
+}
+.btn-login:hover  { -fx-background-color: #1d4ed8; }
+.btn-login:pressed { -fx-background-color: #1e40af; }
+
+/* 重置按钮（白底描边） */
+.btn-reset {
+    -fx-background-color: white;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-border-color: #dbe3ec;
+    -fx-border-radius: 12;
+    -fx-min-height: 42;
+    -fx-pref-height: 42;
+    -fx-cursor: hand;
+}
+.btn-reset:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
 }

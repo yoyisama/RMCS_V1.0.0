@@ -7,107 +7,114 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="root" styleClass="root" xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.rmcs.controller.LoginController">
+<!-- 水平布局：左侧品牌区自适应填充，右侧表单区恒定宽度。
+     使用 HBox 而非 BorderPane——BorderPane 会对无法填满的 center 子节点做居中处理，
+     空间不足时还会把 right 子节点推出窗口右缘（正是登录页显示不全的成因）。 -->
+<HBox fx:id="root" styleClass="login-root" stylesheets="@../css/login.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.rmcs.controller.LoginController">
 
-    <!-- ================= 背景装饰光斑 ================= -->
-    <StackPane styleClass="deco, deco-1" AnchorPane.leftAnchor="-160" AnchorPane.topAnchor="-160"/>
-    <StackPane styleClass="deco, deco-2" AnchorPane.rightAnchor="-120" AnchorPane.bottomAnchor="-180"/>
-    <StackPane styleClass="deco, deco-3" AnchorPane.leftAnchor="300" AnchorPane.bottomAnchor="-150"/>
-    <StackPane styleClass="deco, deco-4" AnchorPane.rightAnchor="380" AnchorPane.topAnchor="-90"/>
+    <!-- ================= 左侧品牌区（蓝色渐变，自适应填充） ================= -->
+    <VBox styleClass="brand-side" spacing="14" HBox.hgrow="ALWAYS" minWidth="280">
+        <padding>
+            <Insets top="36" left="42" right="38" bottom="24"/>
+        </padding>
 
-    <!-- ================= 顶部标题栏 ================= -->
-    <HBox fx:id="titleBar" styleClass="title-bar" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
-          AnchorPane.rightAnchor="0">
-        <StackPane styleClass="title-logo">
-            <Label styleClass="title-logo-text" text="R"/>
-        </StackPane>
-        <VBox styleClass="title-text-box">
-            <Label styleClass="title-main" text="RMCS 测阻机控制系统"/>
-            <Label styleClass="title-sub" text="Resistance Measuring Control System"/>
-        </VBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnMin" styleClass="win-btn" onAction="#onMin" text="—"/>
-        <Button fx:id="btnClose" styleClass="win-btn, win-close" onAction="#onClose" text="✕"/>
-    </HBox>
+        <HBox styleClass="version-pill" alignment="CENTER_LEFT" spacing="6">
+            <Label text="⚙"/>
+            <Label text="RMCS-RESISTOR v1.0.0.0"/>
+        </HBox>
 
-    <!-- ================= 主内容区 ================= -->
-    <AnchorPane AnchorPane.topAnchor="56" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
-                AnchorPane.rightAnchor="0">
+        <Region VBox.vgrow="ALWAYS" minHeight="10"/>
 
-        <!-- 左侧品牌区 -->
-        <VBox styleClass="brand-pane" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="520"
-              AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" alignment="CENTER" spacing="24">
-            <padding>
-                <Insets left="80" right="30"/>
-            </padding>
-            <Label styleClass="brand-slogan" text="精准测阻 · 智慧管控"/>
-            <Label styleClass="brand-desc" wrapText="true" maxWidth="420"
-                   text="为测阻机提供全流程数字化控制&#10;数据实时采集 · 运行安全稳定 · 界面简洁易用"/>
-            <HBox styleClass="stat-row" spacing="16">
-                <StackPane styleClass="stat-chip">
-                    <VBox alignment="CENTER" spacing="4">
-                        <Label styleClass="stat-num" text="8,921"/>
-                        <Label styleClass="stat-label" text="今日检测"/>
-                    </VBox>
-                </StackPane>
-                <StackPane styleClass="stat-chip">
-                    <VBox alignment="CENTER" spacing="4">
-                        <Label styleClass="stat-num" text="99.8%"/>
-                        <Label styleClass="stat-label" text="良品率"/>
-                    </VBox>
-                </StackPane>
-                <StackPane styleClass="stat-chip">
-                    <VBox alignment="CENTER" spacing="4">
-                        <Label styleClass="stat-num" text="24h"/>
-                        <Label styleClass="stat-label" text="稳定运行"/>
-                    </VBox>
-                </StackPane>
+        <Label text="自动测阻机&#10;数字控制中心" styleClass="brand-title" wrapText="true"/>
+        <Label text="高精度7行3区阻值自动巡检、PLC联动步进与工业公差智能判定平台"
+               styleClass="brand-desc" wrapText="true"/>
+
+        <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+        <VBox spacing="12">
+            <HBox styleClass="diag-item" alignment="CENTER_LEFT" spacing="12">
+                <Region styleClass="diag-dot"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="PLC 逻辑控制器" styleClass="diag-title"/>
+                    <Label text="192.168.1.10:502 待命" styleClass="diag-sub"/>
+                </VBox>
+                <Label text="✓" styleClass="diag-check"/>
+            </HBox>
+            <HBox styleClass="diag-item" alignment="CENTER_LEFT" spacing="12">
+                <Region styleClass="diag-dot"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="高精度微欧计串口" styleClass="diag-title"/>
+                    <Label text="COM4 · 9600bps 8-N-1" styleClass="diag-sub"/>
+                </VBox>
+                <Label text="✓" styleClass="diag-check"/>
+            </HBox>
+            <HBox styleClass="diag-item" alignment="CENTER_LEFT" spacing="12">
+                <Region styleClass="diag-dot"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="校准基准与判定库" styleClass="diag-title"/>
+                    <Label text="基准 6.532Ω (±0.010Ω)" styleClass="diag-sub"/>
+                </VBox>
+                <Label text="✓" styleClass="diag-check"/>
             </HBox>
         </VBox>
 
-        <!-- 右侧登录卡片 -->
-        <StackPane styleClass="card-pane" AnchorPane.leftAnchor="580" AnchorPane.rightAnchor="0"
-                   AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
-            <VBox styleClass="card" alignment="TOP_CENTER" spacing="4" maxWidth="380">
-                <padding>
-                    <Insets top="34" bottom="30" left="40" right="40"/>
-                </padding>
-                <StackPane styleClass="login-avatar">
-                    <Label styleClass="login-avatar-icon" text="R"/>
-                </StackPane>
-                <Label styleClass="login-title" text="用户登录"/>
-                <Label styleClass="login-sub" text="请输入账号密码以继续"/>
-                <VBox styleClass="form" spacing="16">
-                    <padding>
-                        <Insets top="22"/>
-                    </padding>
-                    <VBox spacing="6">
-                        <Label styleClass="field-label" text="账号"/>
-                        <HBox styleClass="field" alignment="CENTER_LEFT" spacing="10">
-                            <Label styleClass="field-icon" text="账"/>
-                            <TextField fx:id="accountField" styleClass="field-input" promptText="请输入账号"/>
-                        </HBox>
-                    </VBox>
-                    <VBox spacing="6">
-                        <Label styleClass="field-label" text="密码"/>
-                        <HBox styleClass="field" alignment="CENTER_LEFT" spacing="10">
-                            <Label styleClass="field-icon" text="密"/>
-                            <PasswordField fx:id="passwordField" styleClass="field-input" promptText="请输入密码"/>
-                        </HBox>
-                    </VBox>
-                    <Button fx:id="btnLogin" styleClass="btn-primary" text="登  录"
-                            onAction="#onLogin" maxWidth="Infinity"/>
-                    <Button fx:id="btnReset" styleClass="btn-secondary" text="重  置"
-                            onAction="#onReset" maxWidth="Infinity"/>
-                </VBox>
-            </VBox>
-            <Label styleClass="version" text="V1.0.0" StackPane.alignment="BOTTOM_RIGHT">
-                <StackPane.margin>
-                    <Insets right="20" bottom="12"/>
-                </StackPane.margin>
-            </Label>
-        </StackPane>
-    </AnchorPane>
-</AnchorPane>
+        <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+        <Label text="© 2026 RMCS Precision Electronics. All Rights Reserved." styleClass="copyright"/>
+    </VBox>
+
+    <!-- ================= 右侧表单区（白色，宽度恒定 400~520） ================= -->
+    <VBox styleClass="form-side" minWidth="400" prefWidth="520" maxWidth="520" spacing="8">
+        <padding>
+            <Insets top="54" left="58" right="58" bottom="40"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Label text="🛡" styleClass="eyebrow-icon"/>
+            <Label text="操作员安全认证" styleClass="form-eyebrow"/>
+        </HBox>
+        <Label text="登入系统控制台" styleClass="form-title"/>
+        <Label text="请输入工号凭证以进入自动测阻机在线控制与调度界面" styleClass="form-sub" wrapText="true"/>
+
+        <Region minHeight="18"/>
+
+        <Label text="用户工号 (Username)" styleClass="form-label"/>
+        <HBox styleClass="field-wrap" alignment="CENTER_LEFT" spacing="10">
+            <Label text="👤" styleClass="field-icon"/>
+            <TextField fx:id="accountField" styleClass="field-input" promptText="请输入账号" HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <Region minHeight="8"/>
+
+        <Label text="授权密码 (Password)" styleClass="form-label"/>
+        <HBox styleClass="field-wrap" alignment="CENTER_LEFT" spacing="10">
+            <Label text="🔒" styleClass="field-icon"/>
+            <PasswordField fx:id="passwordField" styleClass="field-input" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="tfPwdVisible" styleClass="field-input" visible="false" managed="false" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnShowPwd" text="👁" styleClass="eye-btn" onAction="#togglePassword"/>
+        </HBox>
+
+        <Region minHeight="16"/>
+
+        <HBox styleClass="quick-fill" alignment="CENTER_LEFT" spacing="8">
+            <Label text="初始凭证:" styleClass="quick-label"/>
+            <Label text="admin" styleClass="code-text"/>
+            <Label text="/" styleClass="quick-label"/>
+            <Label text="123456" styleClass="code-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="✦ 一键填入" styleClass="link-btn" onAction="#fillDefault"/>
+        </HBox>
+
+        <Region minHeight="12"/>
+
+        <Button fx:id="btnLogin" text="进入控制系统 →" styleClass="btn-login" onAction="#onLogin"
+                maxWidth="Infinity" prefHeight="48"/>
+
+        <Button fx:id="btnReset" text="重  置" styleClass="btn-reset" onAction="#onReset"
+                maxWidth="Infinity" prefHeight="42"/>
+
+        <Region VBox.vgrow="ALWAYS"/>
+    </VBox>
+</HBox>

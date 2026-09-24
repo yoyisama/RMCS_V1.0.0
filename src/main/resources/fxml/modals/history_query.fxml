@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.HistoryQueryController"
+           styleClass="modal-overlay" stylesheets="@../../css/main.css">
+    <VBox styleClass="modal-card" prefWidth="740" prefHeight="500" spacing="12">
+
+        <HBox styleClass="dlg-titlebar" alignment="CENTER_LEFT">
+            <Label text="▦" styleClass="dlg-title-icon"/>
+            <Label text="检测履历查询" styleClass="dlg-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="✕" styleClass="dlg-close" onAction="#close"/>
+        </HBox>
+
+        <VBox spacing="12" style="-fx-padding: 14 16 16 16;">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="判定" styleClass="txt-secondary"/>
+            <ComboBox fx:id="cbResult" prefWidth="110"/>
+            <Label text="位置/行号" styleClass="txt-secondary"/>
+            <TextField fx:id="tfKeyword" prefWidth="160" promptText="如 L / R / 3"/>
+            <Button text="查询" styleClass="btn btn-primary" onAction="#applyFilter"/>
+            <Button text="重置" styleClass="btn btn-ghost" onAction="#resetFilter"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTotal" styleClass="txt-secondary"/>
+        </HBox>
+        <TableView fx:id="table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colTime" text="时间" prefWidth="120"/>
+                <TableColumn fx:id="colRow" text="行" prefWidth="60"/>
+                <TableColumn fx:id="colPos" text="位置" prefWidth="70"/>
+                <TableColumn fx:id="colMeasured" text="实测值" prefWidth="110"/>
+                <TableColumn fx:id="colStandard" text="标准值" prefWidth="110"/>
+                <TableColumn fx:id="colResult" text="判定" prefWidth="90"/>
+            </columns>
+        </TableView>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="bg-elevated" style="-fx-padding: 8 10 8 10; -fx-background-radius: 6;">
+            <Label fx:id="lblPass" styleClass="txt-success"/>
+            <Label fx:id="lblFail" styleClass="txt-danger"/>
+            <Label fx:id="lblRate" styleClass="txt-accent"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="导出结果为 CSV（UTF-8 BOM，Excel 可直接打开）" styleClass="txt-muted"/>
+        </HBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="导出 CSV" styleClass="btn btn-success" onAction="#exportCsv"/>
+            <Button text="清空结果" styleClass="btn btn-ghost" onAction="#clearAll"/>
+            <Button text="关闭" styleClass="btn btn-ghost" onAction="#close"/>
+        </HBox>
+        </VBox>
+    </VBox>
+</StackPane>

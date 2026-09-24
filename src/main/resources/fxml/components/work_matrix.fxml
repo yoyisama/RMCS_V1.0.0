@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.WorkMatrixController"
+      styleClass="card" spacing="0" maxWidth="Infinity" maxHeight="Infinity">
+    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="10">
+        <Region styleClass="card-title-stripe"/>
+        <Label text="执行作业" styleClass="card-title"/>
+        <Label text="7行 × 3区阵列" styleClass="card-subtitle"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblLiveStatus" text="● 待命中" styleClass="badge badge-warning"/>
+    </HBox>
+
+    <GridPane fx:id="matrixGrid" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"/>
+</VBox>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.RightPanelController"
+      styleClass="bg-card" minWidth="260" spacing="6" style="-fx-padding: 6 6 6 6;">
+
+    <fx:define>
+        <ToggleGroup fx:id="intervalGroup"/>
+    </fx:define>
+
+    <!-- ① 测定标准与公差 -->
+    <VBox styleClass="card">
+        <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+            <StackPane styleClass="icon-block, icon-sky">
+                <Label text="◔" styleClass="icon-glyph"/>
+            </StackPane>
+            <Label text="测定标准与公差" styleClass="card-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="⚙ 参数设定" styleClass="btn btn-outline-primary" onAction="#openStandardConfig"/>
+        </HBox>
+        <VBox spacing="8" style="-fx-padding: 8 12 10 12;">
+            <HBox spacing="10">
+                <VBox styleClass="small-card" HBox.hgrow="ALWAYS" maxWidth="Infinity" spacing="2">
+                    <Label text="基准标准值 (Target)" styleClass="mini-label"/>
+                    <HBox alignment="BOTTOM_LEFT" spacing="3">
+                        <Label fx:id="lblStandard" text="6.532" styleClass="big-value"/>
+                        <Label text="Ω" styleClass="unit-label"/>
+                    </HBox>
+                </VBox>
+                <VBox spacing="6" minWidth="120">
+                    <HBox styleClass="dev-chip" alignment="CENTER_RIGHT">
+                        <Label text="上偏差" styleClass="dev-label"/>
+                        <Label fx:id="lblUpper" text="+0.01" styleClass="dev-value"/>
+                    </HBox>
+                    <HBox styleClass="dev-chip" alignment="CENTER_RIGHT">
+                        <Label text="下偏差" styleClass="dev-label"/>
+                        <Label fx:id="lblLower" text="-0.01" styleClass="dev-value"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" style="-fx-border-color: -border-soft; -fx-border-width: 1 0 0 0; -fx-padding: 6 0 0 0;">
+                <Label text="合格窗口:" styleClass="mini-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblRange" text="[6.522 Ω ~ 6.542 Ω]" styleClass="range-value"/>
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <!-- ② 数据采集与查询控制 -->
+    <VBox styleClass="card">
+        <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+            <StackPane styleClass="icon-block, icon-emerald">
+                <Label text="⟳" styleClass="icon-glyph"/>
+            </StackPane>
+            <Label text="数据采集与查询控制" styleClass="card-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblRxTx" text="● 轮询就绪" styleClass="mini-mono"/>
+        </HBox>
+        <VBox spacing="6" style="-fx-padding: 8 12 10 12;">
+            <Button fx:id="btnCapture" text="⚡ 单次获取" styleClass="btn btn-outline-primary"
+                    onAction="#captureOnce" maxWidth="Infinity" prefHeight="32"/>
+            <HBox alignment="CENTER_LEFT">
+                <Label text="查询间隔切换:" styleClass="mini-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblIntervalInfo" text="1400 ms (1.4s / 次)" styleClass="range-value"/>
+            </HBox>
+            <HBox spacing="6">
+                <ToggleButton fx:id="tb05" text="0.5s" toggleGroup="$intervalGroup" styleClass="interval-chip" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <ToggleButton fx:id="tb10" text="1.0s" toggleGroup="$intervalGroup" styleClass="interval-chip" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <ToggleButton fx:id="tb14" text="1.4s" toggleGroup="$intervalGroup" styleClass="interval-chip" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <ToggleButton fx:id="tb20" text="2.0s" toggleGroup="$intervalGroup" styleClass="interval-chip" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <ToggleButton fx:id="tb30" text="3.0s" toggleGroup="$intervalGroup" styleClass="interval-chip" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <TextField fx:id="tfCustomInterval" promptText="毫秒 (200~10000)" HBox.hgrow="ALWAYS"/>
+                <Button text="✔ 应用" styleClass="btn btn-primary" onAction="#applyCustom"/>
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <!-- ③ 运行状况与遥测 -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS">
+        <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+            <StackPane styleClass="icon-block, icon-purple">
+                <Label text="◈" styleClass="icon-glyph"/>
+            </StackPane>
+            <Label text="运行状况与遥测" styleClass="card-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↺ 产量清零" styleClass="btn btn-ghost" onAction="#resetCounter"/>
+        </HBox>
+        <HBox spacing="8" style="-fx-padding: 8 12 10 12;">
+            <VBox styleClass="small-card" HBox.hgrow="ALWAYS" spacing="2">
+                <Label text="完成数量" styleClass="mini-label"/>
+                <HBox alignment="BOTTOM_LEFT" spacing="2">
+                    <Label fx:id="lblCount" text="8,921" styleClass="mid-value"/>
+                    <Label text="件" styleClass="unit-label"/>
+                </HBox>
+                <Label text="● 自动累计" styleClass="mini-mono, txt-success"/>
+            </VBox>
+            <VBox styleClass="small-card" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="2">
+                <Label text="设备状态" styleClass="mini-label"/>
+                <Label fx:id="lblStatus" text="● 待机" styleClass="badge badge-info"/>
+                <Label fx:id="lblStatusSub" text="就绪" styleClass="mini-mono"/>
+            </VBox>
+            <VBox styleClass="small-card" HBox.hgrow="ALWAYS" spacing="2">
+                <Label text="运行时长" styleClass="mini-label"/>
+                <Label fx:id="lblDuration" text="02:46:40" styleClass="mid-value"/>
+                <Label fx:id="lblDurationSec" text="0 秒" styleClass="mini-mono"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- ④ 人员操作调度中心 -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS">
+        <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+            <StackPane styleClass="icon-block, icon-blue">
+                <Label text="▤" styleClass="icon-glyph"/>
+            </StackPane>
+            <Label text="人员操作调度中心" styleClass="card-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="● 联锁保护就绪" styleClass="badge badge-success"/>
+        </HBox>
+        <VBox spacing="6" style="-fx-padding: 8 12 10 12;">
+            <HBox alignment="CENTER_LEFT">
+                <Label text="● 核心机台控制" styleClass="group-head"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="急停: 正常释放" styleClass="mini-mono"/>
+            </HBox>
+            <HBox spacing="10">
+                <Button fx:id="btnStart" styleClass="btn btn-core btn-success" onAction="#startMachine"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" prefWidth="120" prefHeight="52">
+                    <graphic>
+                        <HBox alignment="CENTER" spacing="6">
+                            <Label text="▶" styleClass="core-glyph"/>
+                            <VBox alignment="CENTER_LEFT" spacing="0">
+                                <Label fx:id="lblStartTitle" text="设备启动" styleClass="core-title"/>
+                                <Label text="START 开始" styleClass="core-sub"/>
+                            </VBox>
+                        </HBox>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnStop" styleClass="btn btn-core btn-danger" onAction="#stopMachine"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" prefWidth="120" prefHeight="52">
+                    <graphic>
+                        <HBox alignment="CENTER" spacing="6">
+                            <Label text="■" styleClass="core-glyph"/>
+                            <VBox alignment="CENTER_LEFT" spacing="0">
+                                <Label text="设备停止" styleClass="core-title"/>
+                                <Label text="STOP 停止" styleClass="core-sub"/>
+                            </VBox>
+                        </HBox>
+                    </graphic>
+                </Button>
+                <Button styleClass="btn btn-core btn-ghost" onAction="#resetMachine"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity" prefWidth="120" prefHeight="52">
+                    <graphic>
+                        <HBox alignment="CENTER" spacing="6">
+                            <Label text="⟲" styleClass="core-glyph"/>
+                            <VBox alignment="CENTER_LEFT" spacing="0">
+                                <Label text="复位" styleClass="core-title"/>
+                                <Label text="RESET 重置" styleClass="core-sub"/>
+                            </VBox>
+                        </HBox>
+                    </graphic>
+                </Button>
+            </HBox>
+            <Label text="● 数据履历与日志分析" styleClass="group-head"/>
+            <HBox spacing="8">
+                <Button styleClass="op-btn, op-btn-sky" onAction="#openHistoryQuery" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="3">
+                            <StackPane styleClass="op-icon, op-icon-sky"><Label text="🔍"/></StackPane>
+                            <Label text="履历查询" styleClass="op-label"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+                <Button styleClass="op-btn, op-btn-amber" onAction="#openLogQuery" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="3">
+                            <StackPane styleClass="op-icon, op-icon-amber"><Label text="📄"/></StackPane>
+                            <Label text="日志查询" styleClass="op-label"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+                <Button styleClass="op-btn, op-btn-purple" onAction="#exportCsv" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="3">
+                            <StackPane styleClass="op-icon, op-icon-purple"><Label text="⬇"/></StackPane>
+                            <Label text="导出数据" styleClass="op-label"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
+    </VBox>
+</VBox>

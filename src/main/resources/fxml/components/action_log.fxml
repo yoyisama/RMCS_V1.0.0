@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.ActionLogController"
+      styleClass="card" VBox.vgrow="ALWAYS">
+
+    <fx:define>
+        <ToggleGroup fx:id="logFilterGroup"/>
+    </fx:define>
+
+    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+        <Label text="&gt;_" styleClass="log-prompt"/>
+        <Label text="系统运行日志" styleClass="card-title"/>
+        <HBox styleClass="header-tag" alignment="CENTER" spacing="4">
+            <Label fx:id="lblCount" text="0" styleClass="txt-accent"/>
+            <Label text="条记录" styleClass="txt-secondary"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox styleClass="seg-group" spacing="2" alignment="CENTER">
+            <ToggleButton fx:id="tbAll" text="全部" toggleGroup="$logFilterGroup" styleClass="seg-btn" selected="true"/>
+            <ToggleButton fx:id="tbPlc" text="PLC (DB)" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
+            <ToggleButton fx:id="tbCom" text="COM4 电阻计" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
+            <ToggleButton fx:id="tbAlarm" text="报警" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
+        </HBox>
+        <Button fx:id="btnExpand" text="⤢" styleClass="btn-icon" onAction="#openLogQuery"/>
+    </HBox>
+    <ListView fx:id="logList" VBox.vgrow="ALWAYS" styleClass="log-list-view"/>
+</VBox>

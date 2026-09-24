@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.DataHistoryController"
+      styleClass="card" maxWidth="Infinity" maxHeight="Infinity" spacing="0">
+    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="10">
+        <Region styleClass="card-title-stripe"/>
+        <Label text="数据履历" styleClass="card-title"/>
+        <Label fx:id="lblAutoBadge" text="● 自动获取" styleClass="badge badge-success"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnOpenHistory" text="实时记录 (0条)" styleClass="btn btn-ghost" onAction="#openHistoryQuery"/>
+    </HBox>
+    <TableView fx:id="historyTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"
+               style="-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 1 0 1 0;">
+        <columns>
+            <TableColumn fx:id="colRow" text="行号" prefWidth="52"/>
+            <TableColumn fx:id="colPos" text="位置" prefWidth="56"/>
+            <TableColumn fx:id="colMeasured" text="测量值" prefWidth="80"/>
+            <TableColumn fx:id="colStandard" text="标准值" prefWidth="80"/>
+            <TableColumn fx:id="colResult" text="判定" prefWidth="56"/>
+            <TableColumn fx:id="colTime" text="检测时间" prefWidth="110"/>
+        </columns>
+    </TableView>
+    <HBox alignment="CENTER_LEFT" spacing="16" styleClass="bg-elevated"
+          style="-fx-padding: 6 14 6 14; -fx-border-color: -border-soft; -fx-border-width: 1 0 0 0;">
+        <Label fx:id="lblTotal" text="总计: 0" styleClass="txt-secondary"/>
+        <Label fx:id="lblPassCount" text="合格: 0" styleClass="txt-success"/>
+        <Label fx:id="lblFailCount" text="超差: 0" styleClass="txt-danger"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblRate" text="检出率: -" styleClass="txt-accent"/>
+    </HBox>
+</VBox>

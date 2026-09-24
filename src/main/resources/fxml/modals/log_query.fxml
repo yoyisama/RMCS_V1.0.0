@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.LogQueryController"
+           styleClass="modal-overlay" stylesheets="@../../css/main.css">
+    <VBox styleClass="modal-card" prefWidth="760" prefHeight="500" spacing="10" style="-fx-padding: 14 16 14 16;">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Region styleClass="card-title-stripe"/>
+            <Label text="日志查询" styleClass="card-title"/>
+            <Label text="动作履历检索与导出" styleClass="card-subtitle"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="✕" styleClass="btn btn-ghost" onAction="#close"/>
+        </HBox>
+        <Region styleClass="divider" maxHeight="1"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="类型" styleClass="txt-secondary"/>
+            <ComboBox fx:id="cbType" prefWidth="120"/>
+            <Label text="关键字" styleClass="txt-secondary"/>
+            <TextField fx:id="tfKeyword" prefWidth="200" promptText="如 连接 / 电阻 / 错误"/>
+            <Button text="查询" styleClass="btn btn-primary" onAction="#applyFilter"/>
+            <Button text="重置" styleClass="btn btn-ghost" onAction="#resetFilter"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblTotal" styleClass="txt-secondary"/>
+        </HBox>
+        <TableView fx:id="table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colTime" text="时间" prefWidth="100"/>
+                <TableColumn fx:id="colType" text="类型" prefWidth="90"/>
+                <TableColumn fx:id="colMessage" text="内容" prefWidth="480"/>
+            </columns>
+        </TableView>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="bg-elevated" style="-fx-padding: 8 10 8 10; -fx-background-radius: 6;">
+            <Label fx:id="lblInfo" styleClass="txt-accent"/>
+            <Label fx:id="lblWarn" styleClass="txt-warning"/>
+            <Label fx:id="lblErrorCount" styleClass="txt-danger"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="面板与查询均基于最近 200 条日志" styleClass="txt-muted"/>
+        </HBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="导出 TXT" styleClass="btn btn-success" onAction="#exportTxt"/>
+            <Button text="清空日志" styleClass="btn btn-ghost" onAction="#clearAll"/>
+            <Button text="关闭" styleClass="btn btn-ghost" onAction="#close"/>
+        </HBox>
+    </VBox>
+</StackPane>

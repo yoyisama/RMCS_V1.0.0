@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.HeaderController"
+      styleClass="app-header" alignment="CENTER_LEFT">
+
+    <!-- 左：品牌 -->
+    <HBox styleClass="brand-block" alignment="CENTER">
+        <Label text="R" styleClass="brand-logo" alignment="CENTER"/>
+        <VBox spacing="0">
+            <Label text="RMCS" styleClass="brand-name"/>
+            <Label text="INDUSTRIAL" styleClass="brand-industrial"/>
+        </VBox>
+    </HBox>
+
+    <!-- 中：系统标题 + 版本号 -->
+    <Region HBox.hgrow="ALWAYS"/>
+    <HBox alignment="CENTER" spacing="6">
+        <Label text="自动测阻机控制系统" styleClass="header-title"/>
+        <Label text="v1.0.0.0" styleClass="header-version"/>
+    </HBox>
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <!-- 右：模式 + 操作员 -->
+    <VBox alignment="CENTER_RIGHT" spacing="0">
+        <Button fx:id="btnAuto" text="● 自动模式" styleClass="mode-btn, mode-auto" onAction="#toggleAuto"/>
+        <HBox alignment="CENTER_RIGHT" spacing="4">
+            <Label text="操作员:" styleClass="txt-secondary"/>
+            <Label fx:id="lblUser" text="未登录" styleClass="txt-primary"/>
+        </HBox>
+    </VBox>
+
+    <!-- 右：圆形图标按钮组 -->
+    <Button fx:id="btnTheme" text="🌙" styleClass="btn-circle, btn-circle-ghost" onAction="#toggleTheme"/>
+    <Button fx:id="btnFullScreen" text="⛶" styleClass="btn-circle, btn-circle-blue" onAction="#toggleFullScreen"/>
+    <Button fx:id="btnLogout" text="⏻" styleClass="btn-power" onAction="#logout"/>
+</HBox>

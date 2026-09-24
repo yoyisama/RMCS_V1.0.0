@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.FooterBarController"
+      styleClass="app-footer" alignment="CENTER_LEFT">
+
+    <Label fx:id="lblPlcStatus" text="● PLC通信: 已连接" styleClass="footer-status-pill, footer-status-online"/>
+    <Label text="|" styleClass="txt-muted"/>
+    <Label fx:id="lblMeterStatus" text="● 电阻计(COM4): 就绪" styleClass="footer-status-pill, footer-status-offline">
+        <tooltip><Tooltip text="点击重新连接电阻计串口"/></tooltip>
+    </Label>
+    <Label text="|" styleClass="txt-muted"/>
+    <Label fx:id="lblBaud" text="9600bps 8-N-1" styleClass="txt-secondary"/>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <Label text="RMCS工业控制系统平台" styleClass="txt-muted"/>
+    <Label fx:id="lblClock" text="2026/09/21 00:00:00" styleClass="footer-clock"/>
+</HBox>

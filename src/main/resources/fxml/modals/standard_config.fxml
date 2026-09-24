@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.StandardConfigController"
+           styleClass="modal-overlay" stylesheets="@../../css/main.css">
+    <VBox styleClass="modal-card" prefWidth="560" spacing="0">
+
+        <!-- 蓝色标题栏（无边框窗口自绘） -->
+        <HBox styleClass="dlg-titlebar" alignment="CENTER_LEFT">
+            <Label text="⌗" styleClass="dlg-title-icon"/>
+            <Label text="系统与测定标准参数设定" styleClass="dlg-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="✕" styleClass="dlg-close" onAction="#close"/>
+        </HBox>
+
+        <VBox spacing="14" style="-fx-padding: 16 20 18 20;">
+
+            <!-- 节1：测阻判定标准参数 -->
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Region styleClass="card-title-stripe"/>
+                <Label text="测阻判定标准参数 (Ω)" styleClass="section-head" maxWidth="Infinity"/>
+            </HBox>
+            <GridPane hgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33.3"/>
+                    <ColumnConstraints percentWidth="33.3"/>
+                    <ColumnConstraints percentWidth="33.4"/>
+                </columnConstraints>
+                <VBox spacing="4" GridPane.columnIndex="0">
+                    <Label text="目标标准值 (Ω)" styleClass="mini-label"/>
+                    <TextField fx:id="tfStandard"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="1">
+                    <Label text="正向公差上限 (+Ω)" styleClass="mini-label"/>
+                    <TextField fx:id="tfUpperDev"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="2">
+                    <Label text="负向公差下限 (-Ω)" styleClass="mini-label"/>
+                    <TextField fx:id="tfLowerDev"/>
+                </VBox>
+            </GridPane>
+            <HBox styleClass="small-card" alignment="CENTER_LEFT">
+                <Label text="合格判定区间:" styleClass="mini-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblRange" text="6.522 Ω ~ 6.542 Ω" styleClass="range-value"/>
+            </HBox>
+
+            <!-- 节2：硬件通信接口配置 -->
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Region styleClass="card-title-stripe, icon-blue" style="-fx-min-height: 14; -fx-pref-height: 14;"/>
+                <Label text="硬件通信接口配置" styleClass="section-head" maxWidth="Infinity"/>
+            </HBox>
+            <GridPane hgap="14" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="电阻计串口号 (COM Port)" styleClass="mini-label"/>
+                    <ComboBox fx:id="cbComPort" editable="true" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="PLC 以太网 IP 地址" styleClass="mini-label"/>
+                    <TextField fx:id="tfPlcIp"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label text="波特率 (Baud Rate)" styleClass="mini-label"/>
+                    <ComboBox fx:id="cbBaud" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label text="模拟采样节拍间隔 (毫秒)" styleClass="mini-label"/>
+                    <TextField fx:id="tfInterval"/>
+                </VBox>
+            </GridPane>
+
+            <!-- 底部操作 -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="↺ 恢复标准预设" styleClass="btn btn-ghost" onAction="#resetDefault"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="取消" styleClass="btn btn-ghost" onAction="#close"/>
+                <Button text="💾 保存生效" styleClass="btn btn-primary" onAction="#save"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>

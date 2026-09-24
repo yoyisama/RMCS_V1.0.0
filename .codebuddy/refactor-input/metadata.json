@@ -1,0 +1,8 @@
+{
+  "name": "RMCS 工业自动化控制系统",
+  "description": "基于 PLC 通信与串口电阻计的工业自动化测量控制系统 (RMCS) 数字化原型，支持流程联动、实时数据监测与串口/PLC寄存器诊断。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
