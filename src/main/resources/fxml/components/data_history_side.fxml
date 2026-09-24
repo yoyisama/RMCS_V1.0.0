@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- 单侧数据履历（Y1 / Y2 复用同一组件，由 controller.setSide 决定侧别） -->
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.DataHistorySideController"
+      styleClass="card" maxWidth="Infinity" maxHeight="Infinity" spacing="0">
+    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
+        <Region styleClass="card-title-stripe"/>
+        <Label fx:id="lblTitle" text="数据履历" styleClass="card-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnOpenHistory" text="实时记录 (0条)" styleClass="btn btn-ghost" onAction="#openHistoryQuery"/>
+    </HBox>
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"
+               style="-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 1 0 1 0;">
+        <columns>
+            <TableColumn fx:id="colCol" text="列号" prefWidth="48"/>
+            <TableColumn fx:id="colRow" text="行号" prefWidth="62"/>
+            <TableColumn fx:id="colLr" text="左/右" prefWidth="44"/>
+            <TableColumn fx:id="colProduct" text="产品名称" prefWidth="120"/>
+            <TableColumn fx:id="colMeasured" text="测量值" prefWidth="72"/>
+            <TableColumn fx:id="colStandard" text="标准值" prefWidth="72"/>
+            <TableColumn fx:id="colResult" text="结果" prefWidth="50"/>
+            <TableColumn fx:id="colTime" text="时间" prefWidth="92"/>
+        </columns>
+    </TableView>
+    <HBox alignment="CENTER_LEFT" spacing="14" styleClass="bg-elevated"
+          style="-fx-padding: 5 12 5 12; -fx-border-color: -border-soft; -fx-border-width: 1 0 0 0;">
+        <Label fx:id="lblTotal" text="总计: 0" styleClass="txt-secondary"/>
+        <Label fx:id="lblPassCount" text="合格: 0" styleClass="txt-success"/>
+        <Label fx:id="lblFailCount" text="超差: 0" styleClass="txt-danger"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblRate" text="良率: -" styleClass="txt-accent"/>
+    </HBox>
+</VBox>

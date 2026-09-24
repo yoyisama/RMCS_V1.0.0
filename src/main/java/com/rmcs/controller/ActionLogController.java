@@ -31,7 +31,7 @@ public class ActionLogController implements Initializable {
     @FXML private ToggleButton tbAll, tbPlc, tbCom, tbAlarm;
     @FXML private ToggleGroup logFilterGroup;
 
-    private final ObservableList<LogEntry> logs = FXCollections.observableArrayList();
+    private ObservableList<LogEntry> logs = FXCollections.observableArrayList();
     private FilteredList<LogEntry> filtered;
     private Runnable onOpen;
 
@@ -146,6 +146,15 @@ public class ActionLogController implements Initializable {
 
     public void setOnOpen(Runnable r) {
         this.onOpen = r;
+    }
+
+    /** 使用外部共享日志列表（Y1/Y2 两个 Tab 共用同一份系统日志）。 */
+    public void useList(ObservableList<LogEntry> list) {
+        this.logs = list;
+        this.filtered = new FilteredList<>(logs, e -> true);
+        logList.setItems(filtered);
+        logs.addListener((javafx.collections.ListChangeListener<LogEntry>) c -> updateCount());
+        applyFilter("all");
     }
 
     @FXML

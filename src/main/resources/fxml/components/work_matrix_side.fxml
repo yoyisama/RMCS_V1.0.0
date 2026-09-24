@@ -2,17 +2,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!-- 执行作业（方案①）：单卡片单总标题 + 单一共享列头；Y1 | Y2 并排对照，竖线分隔 -->
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.WorkMatrixController"
+<!-- 单侧作业矩阵（Y1 / Y2 复用同一组件，由 controller.setSide 决定侧别） -->
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.WorkMatrixSideController"
       styleClass="card" spacing="0" maxWidth="Infinity" maxHeight="Infinity">
-    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="10">
+    <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="8">
         <Region styleClass="card-title-stripe"/>
-        <Label text="执行作业" styleClass="card-title"/>
+        <Label fx:id="lblTitle" text="执行作业" styleClass="card-title"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblProduct" text="" styleClass="matrix-product" maxWidth="200"/>
         <Label fx:id="lblLiveStatus" text="● 待命中" styleClass="badge badge-warning"/>
     </HBox>
-    <ScrollPane fitToWidth="true" fitToHeight="false" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                pannable="true" VBox.vgrow="ALWAYS"
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="NEVER"
+                VBox.vgrow="ALWAYS"
                 style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 5 7 7 7;">
         <GridPane fx:id="grid" maxWidth="Infinity"/>
     </ScrollPane>

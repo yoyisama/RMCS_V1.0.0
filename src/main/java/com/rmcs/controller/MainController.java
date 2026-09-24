@@ -6,21 +6,29 @@ import com.rmcs.device.Measurement;
 import com.rmcs.device.SerialConfig;
 import com.rmcs.model.AuthUser;
 import com.rmcs.model.InspectionRecord;
+import com.rmcs.model.LogEntry;
 import com.rmcs.model.LogEntry.LogType;
 import com.rmcs.model.MatrixCell;
-import com.rmcs.model.MatrixCell.Position;
+import com.rmcs.model.WorkPos;
 import com.rmcs.model.ProductionStatus;
 import com.rmcs.model.SystemConfig;
 import com.rmcs.service.MeasurementListener;
 import com.rmcs.service.MeterService;
+import com.rmcs.plc.PlcData;
+import com.rmcs.plc.PlcListener;
+import com.rmcs.plc.PlcService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -39,6 +47,8 @@ public class MainController implements MeasurementListener {
 
     /** 电阻计断线后的自动重连周期（秒）。 */
     private static final int RECONNECT_PERIOD_SECONDS = 15;
+    /** 系统日志保留上限。 */
+    private static final int MAX_LOGS = 200;
 
     /**
      * fx:include 子控制器注入：FXMLLoader 会把 fx:id="header" 的 include 文档的
@@ -49,21 +59,36 @@ public class MainController implements MeasurementListener {
     @FXML private VBox workspace;
     @FXML private ScrollPane rightScroll;
 
+    /** 工作区：Y1/Y2 两个 Tab，每 Tab 含单侧作业矩阵 + 单侧数据履历 + 系统运行日志 */
+    @FXML private TabPane sideTabs;
+    @FXML private WorkMatrixSideController workMatrixY1Controller, workMatrixY2Controller;
+    @FXML private DataHistorySideController dataHistoryY1Controller, dataHistoryY2Controller;
+    @FXML private ActionLogController actionLogY1Controller, actionLogY2Controller;
+
     @FXML private HeaderController headerController;
     @FXML private FooterBarController footerBarController;
-    @FXML private WorkMatrixController workMatrixController;
-    @FXML private DataHistoryController dataHistoryController;
-    @FXML private ActionLogController actionLogController;
     @FXML private RightPanelController rightPanelController;
+
+    /** Y1/Y2 两个 Tab（PLC 读到哪一侧数据即自动切到对应 Tab）。 */
+    @FXML private Tab tabY1, tabY2;
+
+    /** Y1/Y2 全部履历总表（导出 CSV 与「履历查询」弹窗使用）。 */
+    private final ObservableList<InspectionRecord> allRecords = FXCollections.observableArrayList();
+
+    /** Y1/Y2 两个 Tab 共用的系统运行日志（同一份，避免分叉）。 */
+    private final ObservableList<LogEntry> sharedLogs = FXCollections.observableArrayList();
 
     private App app;
     private AuthUser user;
     private SystemConfig cfg;
     private ProductionStatus status;
     private MeterService meterService;
+    private PlcService plcService;
     private Timeline statusTick;
-    /** 累计测量次数，用于在没有 row/col 时推断位置（每 21 次循环一次 7×3）。 */
-    private int measureCounter = 0;
+    /** 最近一次电阻计有效读数（由 PLC 侧触发采集时取用）。 */
+    private Double lastMeterValue;
+    /** 当前产品名称（来自 PLC DB36 产品名）。 */
+    private String currentProductName = "";
     /** 断线重连倒计时（秒）。 */
     private int reconnectCountdown = RECONNECT_PERIOD_SECONDS;
     /** 当前主题：false=深色 root-dark，true=明亮 root-light（默认白天模式，模态窗口需跟随）。 */
@@ -124,6 +149,7 @@ public class MainController implements MeasurementListener {
             mainAnchor.widthProperty().addListener((o, a, b) -> layoutRightPanel());
             layoutRightPanel();
         }
+        // 三大模块已改为页签布局（TabPane），每个模块独占全部工作区高度，无需比例分配
         // 场景尺寸监听 + 多帧重排：登录后场景/窗口尺寸是分帧才稳定的，
         // 只在 mainAnchor 上监听会漏掉「首帧尺寸已确定、后续无变化」的情况，
         // 导致右面板停留在旧宽度（表现为登录后截断、拖动窗口才正常）
@@ -178,12 +204,18 @@ public class MainController implements MeasurementListener {
             });
         }
 
-        if (dataHistoryController != null) {
-            dataHistoryController.setOnOpen(this::openHistoryQuery);
-            dataHistoryController.setAutoMode(rightPanelController != null && rightPanelController.isAuto(),
-                    currentIntervalMs());
-        }
-        if (actionLogController   != null) actionLogController.setOnOpen(this::openLogQuery);
+        // Y1/Y2 两个 Tab 各自注入单侧作业矩阵、单侧数据履历，并共享同一份系统日志
+        workMatrixY1Controller.setSide("Y1");
+        workMatrixY2Controller.setSide("Y2");
+        dataHistoryY1Controller.setSide("Y1");
+        dataHistoryY2Controller.setSide("Y2");
+        actionLogY1Controller.useList(sharedLogs);
+        actionLogY2Controller.useList(sharedLogs);
+        dataHistoryY1Controller.setOnOpen(this::openHistoryQuery);
+        dataHistoryY2Controller.setOnOpen(this::openHistoryQuery);
+        actionLogY1Controller.setOnOpen(this::openLogQuery);
+        actionLogY2Controller.setOnOpen(this::openLogQuery);
+        startPlcService();
 
         appendLog(LogType.INFO, "控制台已加载 · 操作员=" + (user == null ? "匿名" : user.getName()));
 
@@ -261,15 +293,138 @@ public class MainController implements MeasurementListener {
         return rightPanelController == null ? cfg.getPollIntervalMs() : rightPanelController.getIntervalMs();
     }
 
+    /** 取指定侧别的作业矩阵控制器。 */
+    private WorkMatrixSideController matrixOf(String side) {
+        return "Y2".equals(side) ? workMatrixY2Controller : workMatrixY1Controller;
+    }
+
+    /** 取指定侧别的数据履历控制器。 */
+    private DataHistorySideController historyOf(String side) {
+        return "Y2".equals(side) ? dataHistoryY2Controller : dataHistoryY1Controller;
+    }
+
+    /** 两侧作业矩阵同步刷新在线状态徽标。 */
+    private void setMatrixLive(ProductionStatus.MachineStatus s) {
+        if (workMatrixY1Controller != null) workMatrixY1Controller.setLiveStatus(s);
+        if (workMatrixY2Controller != null) workMatrixY2Controller.setLiveStatus(s);
+    }
+
+    /** 清空两侧作业矩阵。 */
+    private void clearMatrix() {
+        if (workMatrixY1Controller != null) workMatrixY1Controller.clearAll();
+        if (workMatrixY2Controller != null) workMatrixY2Controller.clearAll();
+    }
+
+    /** 清空两侧数据履历。 */
+    private void clearHistory() {
+        if (dataHistoryY1Controller != null) dataHistoryY1Controller.clearAll();
+        if (dataHistoryY2Controller != null) dataHistoryY2Controller.clearAll();
+    }
+
+    /** 启动 PLC 通讯服务（或离线模拟），并注册数据回调。 */
+    private void startPlcService() {
+        if (cfg == null) return;
+        plcService = new PlcService(cfg, new PlcListener() {
+                    @Override public void onConnected() {
+                        Platform.runLater(() -> {
+                            if (footerBarController != null) footerBarController.setPlcOnline(true);
+                            appendLog(LogType.PLC, cfg.isPlcMock()
+                                    ? "PLC 离线模拟模式已启动（不连接真实设备）"
+                                    : "PLC(" + cfg.getPlcIp() + ") 连接成功");
+                        });
+                    }
+                    @Override public void onConnectionFailed(String reason) {
+                        Platform.runLater(() -> {
+                            if (footerBarController != null) footerBarController.setPlcOnline(false);
+                            appendLog(LogType.ERROR, "PLC 连接失败: " + reason);
+                        });
+                    }
+                    @Override public void onDisconnected(String reason) {
+                        Platform.runLater(() -> {
+                            if (footerBarController != null) footerBarController.setPlcOnline(false);
+                            appendLog(LogType.ERROR, "PLC 已断线: " + reason);
+                        });
+                    }
+                    @Override public void onData(PlcData data) {
+                        Platform.runLater(() -> onPlcData(data));
+                    }
+                });
+        plcService.connect();
+    }
+
+    /** PLC 数据更新标志变化：自动切到对应 Tab，并以最近一次电阻计读数生成一条履历。 */
+    private void onPlcData(PlcData data) {
+        // 仅在 PLC 真正连接（含模拟）时处理；未连接则不走任何 PLC 相关业务逻辑
+        if (data == null || sideTabs == null) return;
+        if (plcService == null || !plcService.isConnected()) return;
+        // 自动切换到该侧 Tab（PLC 读到哪一侧，界面就显示哪一侧）
+        if ("Y2".equals(data.getSide()) && tabY2 != null) {
+            sideTabs.getSelectionModel().select(tabY2);
+        } else if (tabY1 != null) {
+            sideTabs.getSelectionModel().select(tabY1);
+        }
+
+        currentProductName = data.getProductName();
+        if (workMatrixY1Controller != null) workMatrixY1Controller.setProductName(currentProductName);
+        if (workMatrixY2Controller != null) workMatrixY2Controller.setProductName(currentProductName);
+
+        if (lastMeterValue == null) {
+            appendLog(LogType.WARNING, "PLC 上报新测点（" + data.getSide() + " "
+                    + data.getCol() + "列" + data.getLr() + WorkPos.rowName(data.getRow())
+                    + "），但暂无电阻计读数，已跳过");
+            return;
+        }
+
+        double value = lastMeterValue;
+        double std = cfg.getStandard().getStandardValue();
+        boolean pass = value >= cfg.getStandard().getLowerLimit()
+                && value <= cfg.getStandard().getUpperLimit();
+
+        WorkPos pos = new WorkPos(data.getSide(), data.getCol(), data.getLr(), data.getRow());
+        WorkMatrixSideController mc = matrixOf(pos.getSide());
+        if (mc != null) {
+            mc.setCell(pos, new MatrixCell(value, pass, false));
+            mc.setLiveStatus(status.getStatus());
+        }
+
+        InspectionRecord rec = new InspectionRecord(
+                UUID.randomUUID().toString(),
+                pos.getSide(), pos.getCol(), pos.getLr(), pos.getRow(), currentProductName,
+                value, std, pass);
+        historyOf(pos.getSide()).add(rec);
+        allRecords.add(0, rec);
+        if (allRecords.size() > 200) allRecords.remove(200, allRecords.size());
+
+        status.incrementCompleted();
+        if (rightPanelController != null) rightPanelController.refreshStatus();
+
+        // 回写「完成一次记录的标志位」（PLC 自动清零）
+        plcWrite(cfg.getPlcControlDb(), cfg.getPlcAckOffset(), 1);
+
+        appendLog(pass ? LogType.SUCCESS : LogType.WARNING,
+                String.format("[PLC采集] %s %s 阻值: %.3fΩ (%s)",
+                        data.getSide(), pos.describe(), value, pass ? "合格" : "超差"));
+    }
+
+    /** 经 PLC 下发一个 16 位控制字；若 PLC 未连接则明确报错且不执行任何 PLC 逻辑。 */
+    private void plcWrite(int db, int byteOffset, int value) {
+        if (plcService == null) {
+            appendLog(LogType.ERROR, "PLC 服务未初始化，控制信号（DB" + db + ".DBW" + byteOffset + "）未下发");
+            return;
+        }
+        if (!plcService.isConnected()) {
+            appendLog(LogType.ERROR, "PLC 未连接，控制信号（DB" + db + ".DBW" + byteOffset + "）未下发");
+            return;
+        }
+        plcService.writeWord(db, byteOffset, value);
+    }
+
     /** 采样间隔变更：写回配置并重启轮询，使新间隔立即生效（未连接或手动模式仅记录配置）。 */
     private void refreshMeterInterval() {
         long interval = currentIntervalMs();
         cfg.setPollIntervalMs(interval);
         if (meterService != null) meterService.getConfig().setPollIntervalMs(interval);
         if (footerBarController != null) footerBarController.setConfig(cfg.getComPort(), interval);
-        if (dataHistoryController != null) {
-            dataHistoryController.setAutoMode(rightPanelController == null || rightPanelController.isAuto(), interval);
-        }
         appendLog(LogType.INFO, "采样间隔已更新为 " + (interval / 1000.0) + "秒/次");
         if (meterService == null) return;
         if (rightPanelController != null && !rightPanelController.isAuto()) {
@@ -281,12 +436,9 @@ public class MainController implements MeasurementListener {
         meterService.startPolling();
     }
 
-    /** 头部「自动 / 手动模式」切换：全局唯一模式入口，同步右面板、轮询与履历徽章。 */
+    /** 头部「自动 / 手动模式」切换：全局唯一模式入口，同步右面板与轮询。 */
     private void applyAutoMode(boolean auto) {
         if (rightPanelController != null) rightPanelController.setAutoMode(auto);
-        if (dataHistoryController != null) {
-            dataHistoryController.setAutoMode(auto, currentIntervalMs());
-        }
         if (meterService == null) return;
         if (auto) {
             meterService.startPolling();
@@ -355,7 +507,8 @@ public class MainController implements MeasurementListener {
             Platform.runLater(() -> appendLog(LogType.WARNING, "电表返回值无效: " + m.getRaw()));
             return;
         }
-        Platform.runLater(() -> applyMeasurement(m.getValue()));
+        // 仅缓存最近一次有效读数，真正写履历由 PLC 数据更新触发（位置来自 PLC）
+        lastMeterValue = m.getValue();
     }
 
     @Override
@@ -364,65 +517,47 @@ public class MainController implements MeasurementListener {
     }
 
     public void appendLog(LogType type, String msg) {
-        if (actionLogController != null) actionLogController.append(type, msg);
-    }
-
-    /** 将单次有效测量应用到矩阵与履历（在 FX 线程执行）。 */
-    private void applyMeasurement(double value) {
-        double std = cfg.getStandard().getStandardValue();
-        boolean pass = value >= cfg.getStandard().getLowerLimit()
-                && value <= cfg.getStandard().getUpperLimit();
-
-        int cyclePos = measureCounter % 21; // 0..20
-        int row = cyclePos / 3;             // 0..6
-        int colIdx = cyclePos % 3;          // 0..2
-        Position pos = Position.values()[colIdx];
-        measureCounter++;
-
-        if (workMatrixController != null) {
-            workMatrixController.setCell(row, pos, new MatrixCell(value, pass, false));
-            workMatrixController.setLiveStatus(status.getStatus());
-        }
-
-        InspectionRecord rec = new InspectionRecord(
-                UUID.randomUUID().toString(),
-                row + 1, pos.name(),
-                value, std, pass);
-        if (dataHistoryController != null) dataHistoryController.add(rec);
-
-        status.incrementCompleted();
-        if (rightPanelController != null) rightPanelController.refreshStatus();
-
-        appendLog(pass ? LogType.SUCCESS : LogType.WARNING,
-                String.format("[数据采集] 第%d行 [%s区] 阻值: %.3fΩ (%s)", row + 1, pos.name(), value, pass ? "合格" : "超差"));
+        LogEntry e = new LogEntry(String.valueOf(System.nanoTime()), type, msg);
+        ObservableList<LogEntry> logs = sharedLogs;
+        Platform.runLater(() -> {
+            if (logs.size() > MAX_LOGS) logs.remove(MAX_LOGS, logs.size());
+            logs.add(0, e);
+        });
     }
 
     /* ===== 人员操作 ===== */
     public void startMachine() {
         status.setStatus(ProductionStatus.MachineStatus.RUNNING);
         if (rightPanelController != null) rightPanelController.refreshStatus();
-        if (workMatrixController != null) workMatrixController.setLiveStatus(status.getStatus());
-        appendLog(LogType.PLC, "启动自动测量循环");
+        setMatrixLive(status.getStatus());
+        plcWrite(cfg.getPlcControlDb(), cfg.getPlcStartOffset(), 1); // 设备启动
+        appendLog(LogType.PLC, "启动自动测量循环（已下发 PLC 启动信号）");
     }
 
     public void stopMachine() {
         status.setStatus(ProductionStatus.MachineStatus.STOPPED);
         if (rightPanelController != null) rightPanelController.refreshStatus();
-        if (workMatrixController != null) workMatrixController.setLiveStatus(status.getStatus());
-        appendLog(LogType.WARNING, "测量已停止");
+        setMatrixLive(status.getStatus());
+        plcWrite(cfg.getPlcControlDb(), cfg.getPlcStopOffset(), 1); // 设备停止
+        appendLog(LogType.WARNING, "测量已停止（已下发 PLC 停止信号）");
     }
 
     public void resetMachine() {
         status.setStatus(ProductionStatus.MachineStatus.RESETTING);
         status.resetCounters();
-        measureCounter = 0;
-        if (dataHistoryController != null) dataHistoryController.clearAll();
-        if (workMatrixController != null) workMatrixController.clearAll();
+        lastMeterValue = null;
+        currentProductName = "";
+        if (workMatrixY1Controller != null) workMatrixY1Controller.setProductName("");
+        if (workMatrixY2Controller != null) workMatrixY2Controller.setProductName("");
+        clearHistory();
+        clearMatrix();
+        allRecords.clear();
+        plcWrite(cfg.getPlcControlDb(), cfg.getPlcResetOffset(), 1); // 设备复位
         if (rightPanelController != null) rightPanelController.refreshStatus();
-        appendLog(LogType.PLC, "系统已复位");
+        appendLog(LogType.PLC, "系统已复位（已下发 PLC 复位信号）");
         Platform.runLater(() -> status.setStatus(ProductionStatus.MachineStatus.STANDYBY));
         if (rightPanelController != null) rightPanelController.refreshStatus();
-        if (workMatrixController != null) workMatrixController.setLiveStatus(status.getStatus());
+        setMatrixLive(status.getStatus());
     }
 
     public void captureOnce() {
@@ -500,7 +635,7 @@ public class MainController implements MeasurementListener {
     }
 
     public void openStandardConfig() {
-        showModal("standard_config.fxml", "参数设定", 440, 460, (StandardConfigController c) -> {
+        showModal("standard_config.fxml", "参数设定", 620, 640, (StandardConfigController c) -> {
             c.bind(cfg);
             c.setOnSaved(() -> {
                 boolean portChanged = meterService != null
@@ -512,6 +647,8 @@ public class MainController implements MeasurementListener {
                     sc.setUpperDev(cfg.getStandard().getUpperDev());
                     sc.setLowerDev(cfg.getStandard().getLowerDev());
                 }
+                // PLC 参数是否变化（含 IP / 机架 / 槽号 / DB 号 / 所有偏移 / 模拟开关）
+                boolean plcChanged = plcService == null || !plcService.matchesConfig(cfg);
                 if (rightPanelController != null) {
                     rightPanelController.refreshStandard();
                     rightPanelController.refreshStatus();
@@ -530,28 +667,36 @@ public class MainController implements MeasurementListener {
                     meterService.shutdown();
                     startMeterService();
                 }
+                if (plcChanged) {
+                    appendLog(LogType.WARNING, "PLC 参数已变更，正在重新连接 "
+                            + (cfg.isPlcMock() ? "(离线模拟)" : cfg.getPlcIp()) + " ...");
+                    if (plcService != null) plcService.shutdown();
+                    startPlcService();
+                }
             });
         });
     }
 
     public void openHistoryQuery() {
         showModal("history_query.fxml", "履历查询", 780, 540, (HistoryQueryController c) -> {
-            c.bind(dataHistoryController == null ? null : dataHistoryController.getRecords());
-            c.setOnCleared(() -> { if (dataHistoryController != null) dataHistoryController.clearAll(); });
+            c.bind(allRecords);
+            c.setOnCleared(() -> {
+                allRecords.clear();
+                clearHistory();
+            });
         });
     }
 
     public void openLogQuery() {
         showModal("log_query.fxml", "日志查询", 800, 540, (LogQueryController c) -> {
-            c.bind(actionLogController == null ? null : actionLogController.getLogs());
-            c.setOnCleared(() -> { if (actionLogController != null) actionLogController.clearAll(); });
+            c.bind(sharedLogs);
+            c.setOnCleared(sharedLogs::clear);
         });
     }
 
     /** 直接导出全部检测履历为 CSV（右面板「导出数据」按钮）。 */
     public void exportCsv() {
-        if (dataHistoryController == null) return;
-        var records = dataHistoryController.getRecords();
+        var records = allRecords;
         FileChooser fc = new FileChooser();
         fc.setTitle("导出检测履历");
         fc.setInitialFileName("inspection_history_" + timestamp() + ".csv");
@@ -560,9 +705,10 @@ public class MainController implements MeasurementListener {
         if (file == null) return;
         try (PrintWriter w = new PrintWriter(file, "UTF-8")) {
             w.write('\uFEFF');
-            w.println("时间,行,位置,实测值,标准值,判定");
+            w.println("时间,Y1/Y2,列号,行号,左/右,产品名称,实测值,标准值,判定");
             for (com.rmcs.model.InspectionRecord r : records) {
-                w.printf("%s,%d,%s,%s,%s,%s%n", r.getFormattedTime(), r.getRow(), r.getPosition(),
+                w.printf("%s,%s,%d,%s,%s,%s,%s,%s,%s%n", r.getFormattedTime(), r.getSide(), r.getCol(),
+                        com.rmcs.model.WorkPos.rowName(r.getRow()), r.getLr(), r.getProductName(),
                         r.getFormattedMeasured(), r.getFormattedStandard(), r.isResult() ? "合格" : "不合格");
             }
             w.flush();
@@ -589,6 +735,7 @@ public class MainController implements MeasurementListener {
     /** 释放后台线程、串口与计时器；登出或关闭窗口时调用，避免重复登录累积泄漏。 */
     public void releaseResources() {
         if (meterService != null) { meterService.shutdown(); meterService = null; }
+        if (plcService != null) { plcService.shutdown(); plcService = null; }
         if (statusTick != null) { statusTick.stop(); statusTick = null; }
         if (footerBarController != null) footerBarController.stop();
     }

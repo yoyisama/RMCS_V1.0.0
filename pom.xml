@@ -39,6 +39,12 @@
             <artifactId>jSerialComm</artifactId>
             <version>2.11.0</version>
         </dependency>
+        <!-- S7 协议：西门子 S7-1200/1500 PLC 以太网通讯 -->
+        <dependency>
+            <groupId>com.github.s7connector</groupId>
+            <artifactId>s7connector</artifactId>
+            <version>2.1</version>
+        </dependency>
     </dependencies>
 
     <build>

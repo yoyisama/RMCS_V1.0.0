@@ -232,6 +232,86 @@
 .badge-violet  { -fx-background-color: #8b5cf622; -fx-text-fill: -violet; }
 .badge-running { -fx-background-color: #10b98122; -fx-text-fill: -success; }
 
+/* ===== 模块页签（执行作业 / 数据履历 / 系统运行日志） ===== */
+.module-tabs { -fx-background-color: transparent; }
+.module-tabs > .tab-header-area {
+    -fx-background-color: transparent;
+    -fx-padding: 2 6 0 6;
+    -fx-background-insets: 0;
+}
+.module-tabs .tab {
+    -fx-background-color: #dbe3ee;
+    -fx-background-radius: 10 10 0 0;
+    -fx-padding: 6 22 6 22;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+.module-tabs .tab .tab-label {
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+}
+.module-tabs .tab:hover .tab-label { -fx-text-fill: #1e293b; }
+.module-tabs .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-color: transparent transparent #0078d4 transparent;
+}
+.module-tabs .tab:selected .tab-label { -fx-text-fill: #0078d4; }
+.module-tabs > .tab-content-area { -fx-padding: 0; -fx-background-color: transparent; }
+.root-dark .module-tabs .tab { -fx-background-color: #1f2635; }
+.root-dark .module-tabs .tab .tab-label { -fx-text-fill: #94a3b8; }
+.root-dark .module-tabs .tab:hover .tab-label { -fx-text-fill: #e2e8f0; }
+.root-dark .module-tabs .tab:selected { -fx-background-color: #181c24; }
+.root-dark .module-tabs .tab:selected .tab-label { -fx-text-fill: #38bdf8; }
+
+/* ===== Y1/Y2 侧别 Tab（工作区顶部） ===== */
+.side-tabs { -fx-background-color: transparent; }
+.side-tabs > .tab-header-area {
+    -fx-background-color: -bg-panel;
+    -fx-background-radius: 10;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-padding: 4;
+    -fx-background-insets: 0;
+}
+.side-tabs > .tab-header-area > .tab-header-background { -fx-background-color: transparent; }
+.side-tabs .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6 26 6 26;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+.side-tabs .tab .tab-label {
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: -txt-sec;
+}
+.side-tabs .tab:hover { -fx-background-color: -bg-hover; }
+.side-tabs .tab:hover .tab-label { -fx-text-fill: -txt; }
+.side-tabs .tab:selected {
+    -fx-background-color: -accent;
+    -fx-effect: dropshadow(gaussian, rgba(0,120,212,0.30), 4, 0, 0, 0);
+}
+.side-tabs .tab:selected .tab-label { -fx-text-fill: white; }
+.side-tabs .tab:selected:hover { -fx-background-color: -accent; }
+.side-tabs > .tab-content-area { -fx-padding: 6 0 0 0; -fx-background-color: transparent; }
+.side-tabs .focus-indicator { -fx-border-width: 0; }
+
+/* ===== 侧别标签（Y1/Y2 子表标识） ===== */
+.side-tag {
+    -fx-font-size: 11;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 6;
+}
+.side-tag-y1 { -fx-text-fill: #0284c7; -fx-background-color: #38bdf826; }
+.side-tag-y2 { -fx-text-fill: #6d28d9; -fx-background-color: #a78bfa33; }
+.root-dark .side-tag-y1 { -fx-text-fill: #7dd3fc; }
+.root-dark .side-tag-y2 { -fx-text-fill: #c4b5fd; }
+
 /* ===== 矩阵单元 ===== */
 .matrix-cell {
     -fx-background-color: -bg-input;
@@ -240,8 +320,13 @@
     -fx-background-radius: 6;
     -fx-alignment: center;
     -fx-font-family: 'Consolas';
-    -fx-font-size: 13;
+    -fx-font-size: 11;
 }
+/* Y1/Y2 分区标识（合并矩阵，避免双表头重复） */
+.matrix-side-cell-y1 { -fx-border-color: #2a3142 #2a3142 #2a3142 #3b82f6; -fx-border-width: 1 1 1 3; }
+.matrix-side-cell-y2 { -fx-border-color: #2a3142 #2a3142 #2a3142 #f59e0b; -fx-border-width: 1 1 1 3; }
+.matrix-divider-top { -fx-border-color: #475569 #2a3142 #2a3142 #2a3142; -fx-border-width: 2 1 1 1; }
+
 .matrix-cell-pass {
     -fx-background-color: #10b9811f;
     -fx-border-color: #10b98166;
@@ -268,7 +353,7 @@
     -fx-alignment: center;
     -fx-font-weight: bold;
     -fx-text-fill: #cbd5e1;
-    -fx-font-size: 12;
+    -fx-font-size: 11;
     -fx-background-radius: 4;
     -fx-border-radius: 4;
 }
@@ -277,6 +362,11 @@
     -fx-border-color: #e2e8f0;
     -fx-text-fill: #475569;
 }
+/* Y1/Y2 行标签底色（在 matrix-head 之后声明，确保分区色生效） */
+.matrix-side-head-y1 { -fx-background-color: #1d4ed826; -fx-text-fill: #bfdbfe; }
+.matrix-side-head-y2 { -fx-background-color: #b4530926; -fx-text-fill: #fde68a; }
+.root-light .matrix-side-head-y1 { -fx-background-color: #1d4ed814; -fx-text-fill: #1e40af; }
+.root-light .matrix-side-head-y2 { -fx-background-color: #b4530914; -fx-text-fill: #92400e; }
 .matrix-col-head {
     -fx-background-color: #1e2638;
     -fx-border-color: #313f5c;
@@ -292,6 +382,16 @@
     -fx-border-color: #90caf9;
     -fx-text-fill: #1565c0;
 }
+/* 作业矩阵头部当前产品名 */
+.matrix-product {
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: -txt-sec;
+    -fx-padding: 0 8 0 6;
+    -fx-max-width: 200;
+    -fx-ellipsis-string: "...";
+}
+.root-light .matrix-product { -fx-text-fill: #475569; }
 /* 单元格明暗双主题（原型：亮色合格=浅蓝、超差=浅玫红） */
 .root-light .matrix-cell-pass {
     -fx-background-color: #f0f9ff;
@@ -312,6 +412,20 @@
     -fx-background-color: #fffbeb;
     -fx-border-color: #fbbf24;
     -fx-text-fill: #92400e;
+}
+
+/* 方案①：带状共享列头的分隔线 */
+.band-divider { -fx-background-color: -border-soft; }
+.band-divider-v { -fx-background-color: -border-soft; }
+/* Y2 履历表隐藏自身表头，共用 Y1 表头（单一共享列头） */
+.table-view.no-header { -fx-padding: 0; }
+.table-view.no-header .column-header-background {
+    -fx-min-height: 0; -fx-pref-height: 0; -fx-max-height: 0; -fx-padding: 0;
+}
+.table-view.no-header .column-header,
+.table-view.no-header .filler,
+.table-view.no-header .nested-column-header {
+    -fx-min-height: 0; -fx-pref-height: 0; -fx-max-height: 0; -fx-padding: 0; -fx-border-width: 0;
 }
 
 /* ===== 表格 ===== */

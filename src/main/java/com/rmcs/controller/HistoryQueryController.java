@@ -24,6 +24,7 @@ public class HistoryQueryController {
     @FXML private TableColumn<InspectionRecord, String> colTime;
     @FXML private TableColumn<InspectionRecord, String> colRow;
     @FXML private TableColumn<InspectionRecord, String> colPos;
+    @FXML private TableColumn<InspectionRecord, String> colProduct;
     @FXML private TableColumn<InspectionRecord, String> colMeasured;
     @FXML private TableColumn<InspectionRecord, String> colStandard;
     @FXML private TableColumn<InspectionRecord, String> colResult;
@@ -44,6 +45,7 @@ public class HistoryQueryController {
         colTime.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFormattedTime()));
         colRow.setCellValueFactory(d -> new SimpleStringProperty("第" + d.getValue().getRow() + "行"));
         colPos.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getPosition() + "区"));
+        colProduct.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getProductName()));
         colMeasured.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFormattedMeasured()));
         colStandard.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFormattedStandard()));
         colResult.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().isResult() ? "合格 ✓" : "不合格 ✗"));
@@ -120,10 +122,10 @@ public class HistoryQueryController {
         if (file == null) return;
         try (PrintWriter w = new PrintWriter(file, "UTF-8")) {
             w.write('\uFEFF');
-            w.println("时间,行,位置,实测值,标准值,判定");
+            w.println("时间,行,位置,产品名称,实测值,标准值,判定");
             for (InspectionRecord r : filtered) {
-                w.printf("%s,%d,%s,%s,%s,%s%n",
-                        r.getFormattedTime(), r.getRow(), r.getPosition(),
+                w.printf("%s,%d,%s,%s,%s,%s,%s%n",
+                        r.getFormattedTime(), r.getRow(), r.getPosition(), r.getProductName(),
                         r.getFormattedMeasured(), r.getFormattedStandard(),
                         r.isResult() ? "合格" : "不合格");
             }

@@ -2,6 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<!-- 数据履历（方案①）：单卡片单总标题 + 单一共享列头；Y1 | Y2 两张表并排，Y2 表头隐藏以共用 Y1 表头 -->
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmcs.controller.DataHistoryController"
       styleClass="card" maxWidth="Infinity" maxHeight="Infinity" spacing="0">
     <HBox styleClass="card-header" alignment="CENTER_LEFT" spacing="10">
@@ -11,23 +12,45 @@
         <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="btnOpenHistory" text="实时记录 (0条)" styleClass="btn btn-ghost" onAction="#openHistoryQuery"/>
     </HBox>
-    <TableView fx:id="historyTable" VBox.vgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity"
-               style="-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 1 0 1 0;">
-        <columns>
-            <TableColumn fx:id="colRow" text="行号" prefWidth="52"/>
-            <TableColumn fx:id="colPos" text="位置" prefWidth="56"/>
-            <TableColumn fx:id="colMeasured" text="测量值" prefWidth="80"/>
-            <TableColumn fx:id="colStandard" text="标准值" prefWidth="80"/>
-            <TableColumn fx:id="colResult" text="判定" prefWidth="56"/>
-            <TableColumn fx:id="colTime" text="检测时间" prefWidth="110"/>
-        </columns>
-    </TableView>
+
+    <HBox spacing="0" alignment="CENTER" style="-fx-padding: 4 6 0 6;">
+        <Label text="Y1" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER" styleClass="txt-accent" style="-fx-font-weight: bold;"/>
+        <Region styleClass="band-divider-v" minWidth="2" prefWidth="2" maxWidth="2"/>
+        <Label text="Y2" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER" styleClass="txt-accent" style="-fx-font-weight: bold;"/>
+    </HBox>
+
+    <HBox spacing="0" VBox.vgrow="ALWAYS" style="-fx-padding: 2 6 2 6;">
+        <TableView fx:id="y1Table" HBox.hgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+            <columns>
+                <TableColumn fx:id="y1ColCol" text="列号" prefWidth="52"/>
+                <TableColumn fx:id="y1ColRow" text="行号" prefWidth="66"/>
+                <TableColumn fx:id="y1ColLr" text="左/右" prefWidth="46"/>
+                <TableColumn fx:id="y1ColMeasured" text="测量值" prefWidth="78"/>
+                <TableColumn fx:id="y1ColStandard" text="标准值" prefWidth="78"/>
+                <TableColumn fx:id="y1ColResult" text="结果" prefWidth="52"/>
+                <TableColumn fx:id="y1ColTime" text="时间" prefWidth="92"/>
+            </columns>
+        </TableView>
+        <Region styleClass="band-divider-v" minWidth="2" prefWidth="2" maxWidth="2"/>
+        <TableView fx:id="y2Table" HBox.hgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity">
+            <columns>
+                <TableColumn fx:id="y2ColCol" text="列号" prefWidth="52"/>
+                <TableColumn fx:id="y2ColRow" text="行号" prefWidth="66"/>
+                <TableColumn fx:id="y2ColLr" text="左/右" prefWidth="46"/>
+                <TableColumn fx:id="y2ColMeasured" text="测量值" prefWidth="78"/>
+                <TableColumn fx:id="y2ColStandard" text="标准值" prefWidth="78"/>
+                <TableColumn fx:id="y2ColResult" text="结果" prefWidth="52"/>
+                <TableColumn fx:id="y2ColTime" text="时间" prefWidth="92"/>
+            </columns>
+        </TableView>
+    </HBox>
+
     <HBox alignment="CENTER_LEFT" spacing="16" styleClass="bg-elevated"
-          style="-fx-padding: 6 14 6 14; -fx-border-color: -border-soft; -fx-border-width: 1 0 0 0;">
+          style="-fx-padding: 5 12 5 12; -fx-border-color: -border-soft; -fx-border-width: 1 0 0 0;">
         <Label fx:id="lblTotal" text="总计: 0" styleClass="txt-secondary"/>
         <Label fx:id="lblPassCount" text="合格: 0" styleClass="txt-success"/>
         <Label fx:id="lblFailCount" text="超差: 0" styleClass="txt-danger"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="lblRate" text="检出率: -" styleClass="txt-accent"/>
+        <Label fx:id="lblRate" text="良率: -" styleClass="txt-accent"/>
     </HBox>
 </VBox>

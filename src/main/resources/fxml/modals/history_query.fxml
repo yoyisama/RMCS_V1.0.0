@@ -28,6 +28,7 @@
                 <TableColumn fx:id="colTime" text="时间" prefWidth="120"/>
                 <TableColumn fx:id="colRow" text="行" prefWidth="60"/>
                 <TableColumn fx:id="colPos" text="位置" prefWidth="70"/>
+                <TableColumn fx:id="colProduct" text="产品名称" prefWidth="120"/>
                 <TableColumn fx:id="colMeasured" text="实测值" prefWidth="110"/>
                 <TableColumn fx:id="colStandard" text="标准值" prefWidth="110"/>
                 <TableColumn fx:id="colResult" text="判定" prefWidth="90"/>

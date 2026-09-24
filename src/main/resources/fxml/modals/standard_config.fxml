@@ -13,73 +13,178 @@
             <Button text="✕" styleClass="dlg-close" onAction="#close"/>
         </HBox>
 
-        <VBox spacing="14" style="-fx-padding: 16 20 18 20;">
+        <!-- 主体内容可滚动，避免字段过多时超出屏幕 -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    style="-fx-background-color: transparent; -fx-padding: 0;">
+            <VBox spacing="14" style="-fx-padding: 16 20 18 20;">
 
-            <!-- 节1：测阻判定标准参数 -->
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <Region styleClass="card-title-stripe"/>
-                <Label text="测阻判定标准参数 (Ω)" styleClass="section-head" maxWidth="Infinity"/>
-            </HBox>
-            <GridPane hgap="12">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="33.3"/>
-                    <ColumnConstraints percentWidth="33.3"/>
-                    <ColumnConstraints percentWidth="33.4"/>
-                </columnConstraints>
-                <VBox spacing="4" GridPane.columnIndex="0">
-                    <Label text="目标标准值 (Ω)" styleClass="mini-label"/>
-                    <TextField fx:id="tfStandard"/>
-                </VBox>
-                <VBox spacing="4" GridPane.columnIndex="1">
-                    <Label text="正向公差上限 (+Ω)" styleClass="mini-label"/>
-                    <TextField fx:id="tfUpperDev"/>
-                </VBox>
-                <VBox spacing="4" GridPane.columnIndex="2">
-                    <Label text="负向公差下限 (-Ω)" styleClass="mini-label"/>
-                    <TextField fx:id="tfLowerDev"/>
-                </VBox>
-            </GridPane>
-            <HBox styleClass="small-card" alignment="CENTER_LEFT">
-                <Label text="合格判定区间:" styleClass="mini-label"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblRange" text="6.522 Ω ~ 6.542 Ω" styleClass="range-value"/>
-            </HBox>
+                <!-- 全局错误提示 -->
+                <Label fx:id="lblError" style="-fx-text-fill: -danger; -fx-font-size: 11;" wrapText="true"
+                       visible="false" managed="false"/>
 
-            <!-- 节2：硬件通信接口配置 -->
-            <HBox alignment="CENTER_LEFT" spacing="8">
-                <Region styleClass="card-title-stripe, icon-blue" style="-fx-min-height: 14; -fx-pref-height: 14;"/>
-                <Label text="硬件通信接口配置" styleClass="section-head" maxWidth="Infinity"/>
-            </HBox>
-            <GridPane hgap="14" vgap="10">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="50"/>
-                    <ColumnConstraints percentWidth="50"/>
-                </columnConstraints>
-                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                    <Label text="电阻计串口号 (COM Port)" styleClass="mini-label"/>
-                    <ComboBox fx:id="cbComPort" editable="true" maxWidth="Infinity"/>
-                </VBox>
-                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                    <Label text="PLC 以太网 IP 地址" styleClass="mini-label"/>
-                    <TextField fx:id="tfPlcIp"/>
-                </VBox>
-                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                    <Label text="波特率 (Baud Rate)" styleClass="mini-label"/>
-                    <ComboBox fx:id="cbBaud" maxWidth="Infinity"/>
-                </VBox>
-                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <Label text="模拟采样节拍间隔 (毫秒)" styleClass="mini-label"/>
-                    <TextField fx:id="tfInterval"/>
-                </VBox>
-            </GridPane>
+                <!-- 节1：测阻判定标准参数 -->
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Region styleClass="card-title-stripe"/>
+                    <Label text="测阻判定标准参数 (Ω)" styleClass="section-head" maxWidth="Infinity"/>
+                </HBox>
+                <GridPane hgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.3"/>
+                        <ColumnConstraints percentWidth="33.3"/>
+                        <ColumnConstraints percentWidth="33.4"/>
+                    </columnConstraints>
+                    <VBox spacing="4" GridPane.columnIndex="0">
+                        <Label text="目标标准值 (Ω)" styleClass="mini-label"/>
+                        <TextField fx:id="tfStandard"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1">
+                        <Label text="正向公差上限 (+Ω)" styleClass="mini-label"/>
+                        <TextField fx:id="tfUpperDev"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="2">
+                        <Label text="负向公差下限 (-Ω)" styleClass="mini-label"/>
+                        <TextField fx:id="tfLowerDev"/>
+                    </VBox>
+                </GridPane>
+                <HBox styleClass="small-card" alignment="CENTER_LEFT">
+                    <Label text="合格判定区间:" styleClass="mini-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblRange" text="6.522 Ω ~ 6.542 Ω" styleClass="range-value"/>
+                </HBox>
 
-            <!-- 底部操作 -->
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="↺ 恢复标准预设" styleClass="btn btn-ghost" onAction="#resetDefault"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="取消" styleClass="btn btn-ghost" onAction="#close"/>
-                <Button text="💾 保存生效" styleClass="btn btn-primary" onAction="#save"/>
-            </HBox>
-        </VBox>
+                <!-- 节2：硬件通信接口配置 -->
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Region styleClass="card-title-stripe, icon-blue" style="-fx-min-height: 14; -fx-pref-height: 14;"/>
+                    <Label text="硬件通信接口配置" styleClass="section-head" maxWidth="Infinity"/>
+                </HBox>
+                <GridPane hgap="14" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="电阻计串口号 (COM Port)" styleClass="mini-label"/>
+                        <ComboBox fx:id="cbComPort" editable="true" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="PLC 以太网 IP 地址" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcIp"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="波特率 (Baud Rate)" styleClass="mini-label"/>
+                        <ComboBox fx:id="cbBaud" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="模拟采样节拍间隔 (毫秒)" styleClass="mini-label"/>
+                        <TextField fx:id="tfInterval"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="PLC 机架号 (Rack)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcRack"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="PLC 槽号 (Slot)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcSlot"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                        <Label text="产品名最大长度 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcLen"/>
+                    </VBox>
+                    <HBox spacing="6" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <CheckBox fx:id="chkPlcMock" text="PLC 离线模拟模式" styleClass="chk"/>
+                        <Label text="(无硬件时勾选)" styleClass="txt-muted"/>
+                    </HBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                        <Label text="PLC 型号" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcModel" editable="false" focusTraversable="false"
+                                   text="S7-1200" style="-fx-opacity: 0.85;"/>
+                    </VBox>
+                </GridPane>
+
+                <!-- 节3：PLC 数据区配置 (PLC → 上位机) -->
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Region styleClass="card-title-stripe, icon-blue" style="-fx-min-height: 14; -fx-pref-height: 14;"/>
+                    <Label text="PLC 数据区配置 (PLC → 上位机)" styleClass="section-head" maxWidth="Infinity"/>
+                </HBox>
+                <GridPane hgap="14" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="数据 DB 号" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcDataDb"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="心跳偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcHeartbeatOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="产品名偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcNameOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="更新标志偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcUpdateFlagOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="左右侧偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcSideOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="行号偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcRowOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                        <Label text="列号偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcColOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label text="Y1/Y2 码偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcYCodeOffset"/>
+                    </VBox>
+                </GridPane>
+
+                <!-- 节4：PLC 控制区配置 (上位机 → PLC) -->
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Region styleClass="card-title-stripe, icon-blue" style="-fx-min-height: 14; -fx-pref-height: 14;"/>
+                    <Label text="PLC 控制区配置 (上位机 → PLC)" styleClass="section-head" maxWidth="Infinity"/>
+                </HBox>
+                <GridPane hgap="14" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="控制 DB 号" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcControlDb"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="完成回写偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcAckOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="启动偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcStartOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="停止偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcStopOffset"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="复位偏移 (字节)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcResetOffset"/>
+                    </VBox>
+                </GridPane>
+
+                <!-- 底部操作 -->
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="↺ 恢复标准预设" styleClass="btn btn-ghost" onAction="#resetDefault"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="取消" styleClass="btn btn-ghost" onAction="#close"/>
+                    <Button text="💾 保存生效" styleClass="btn btn-primary" onAction="#save"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
     </VBox>
 </StackPane>

@@ -16,16 +16,42 @@
             <!-- 水平布局：工作区自适应，右面板固定宽度（代码中按屏幕动态调整 330~360） -->
             <HBox fx:id="mainAnchor" styleClass="bg-app" spacing="8" style="-fx-padding: 8 4 4 8;"
                   minWidth="700">
-                <!-- 左侧工作区 -->
-                <VBox fx:id="workspace" spacing="8" HBox.hgrow="ALWAYS" minWidth="380">
-                    <HBox spacing="8" VBox.vgrow="ALWAYS">
-                        <fx:include fx:id="workMatrix" source="components/work_matrix.fxml"
-                                    HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="200"/>
-                        <fx:include fx:id="dataHistory" source="components/data_history.fxml"
-                                    HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="200"/>
-                    </HBox>
-                    <fx:include fx:id="actionLog" source="components/action_log.fxml"
-                                VBox.vgrow="ALWAYS" maxWidth="Infinity" minHeight="120" prefHeight="170"/>
+                <!-- 左侧工作区：2×2 四象限——左列上下排列两张执行作业（Y1/Y2），
+                     右列上下排列对应侧的数据履历，作业与履历水平对齐；底部横贯系统运行日志 -->
+                <VBox fx:id="workspace" spacing="6" HBox.hgrow="ALWAYS" minWidth="380"
+                      style="-fx-padding: 6 4 4 8;">
+                    <!-- Y1 / Y2 两个 Tab：每 Tab 含「单侧作业矩阵 + 单侧数据履历 + 系统运行日志」 -->
+                    <TabPane fx:id="sideTabs" VBox.vgrow="ALWAYS" styleClass="side-tabs"
+                             tabClosingPolicy="UNAVAILABLE" minHeight="200">
+                        <Tab fx:id="tabY1" text="Y1 侧 · 左侧">
+                            <VBox spacing="6" VBox.vgrow="ALWAYS" style="-fx-padding: 4 2 2 2;">
+                                <!-- 上区：作业矩阵 与 数据履历 左右排列 -->
+                                <HBox spacing="6" VBox.vgrow="SOMETIMES" maxHeight="500">
+                                    <fx:include fx:id="workMatrixY1" source="components/work_matrix_side.fxml"
+                                                HBox.hgrow="SOMETIMES" minWidth="340" prefWidth="460" maxWidth="640"/>
+                                    <fx:include fx:id="dataHistoryY1" source="components/data_history_side.fxml"
+                                                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                </HBox>
+                                <!-- 下区：系统运行日志 -->
+                                <fx:include fx:id="actionLogY1" source="components/action_log.fxml"
+                                            VBox.vgrow="ALWAYS" maxWidth="Infinity" minHeight="150"/>
+                            </VBox>
+                        </Tab>
+                        <Tab fx:id="tabY2" text="Y2 侧 · 右侧">
+                            <VBox spacing="6" VBox.vgrow="ALWAYS" style="-fx-padding: 4 2 2 2;">
+                                <!-- 上区：作业矩阵 与 数据履历 左右排列 -->
+                                <HBox spacing="6" VBox.vgrow="SOMETIMES" maxHeight="500">
+                                    <fx:include fx:id="workMatrixY2" source="components/work_matrix_side.fxml"
+                                                HBox.hgrow="SOMETIMES" minWidth="340" prefWidth="460" maxWidth="640"/>
+                                    <fx:include fx:id="dataHistoryY2" source="components/data_history_side.fxml"
+                                                HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                </HBox>
+                                <!-- 下区：系统运行日志 -->
+                                <fx:include fx:id="actionLogY2" source="components/action_log.fxml"
+                                            VBox.vgrow="ALWAYS" maxWidth="Infinity" minHeight="150"/>
+                            </VBox>
+                        </Tab>
+                    </TabPane>
                 </VBox>
                 <!-- 右侧控制面板：宽度由代码维护，高度强制等于视口（fitToHeight），
                      配合右面板内 VBox.vgrow 分配空间，保证四张卡片完整显示、不产生滚动 -->
