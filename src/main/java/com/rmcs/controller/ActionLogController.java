@@ -28,7 +28,7 @@ public class ActionLogController implements Initializable {
 
     @FXML private ListView<LogEntry> logList;
     @FXML private Label lblCount;
-    @FXML private ToggleButton tbAll, tbPlc, tbCom, tbAlarm;
+    @FXML private ToggleButton tbAll, tbSystem, tbPlc, tbCom, tbAlarm;
     @FXML private ToggleGroup logFilterGroup;
 
     private ObservableList<LogEntry> logs = FXCollections.observableArrayList();
@@ -44,7 +44,7 @@ public class ActionLogController implements Initializable {
             @Override
             protected void updateItem(LogEntry item, boolean empty) {
                 super.updateItem(item, empty);
-                getStyleClass().removeAll("log-line", "log-info", "log-plc", "log-com",
+                getStyleClass().removeAll("log-line", "log-info", "log-system", "log-plc", "log-com",
                         "log-success", "log-warning", "log-error");
                 if (empty || item == null) {
                     setGraphic(null);
@@ -67,6 +67,7 @@ public class ActionLogController implements Initializable {
 
             private String tagOf(LogEntry.LogType t) {
                 switch (t) {
+                    case SYSTEM:  return "系统";
                     case PLC:     return "PLC";
                     case COM:     return "串口";
                     case SUCCESS: return "成功";
@@ -78,6 +79,7 @@ public class ActionLogController implements Initializable {
         });
 
         tbAll.setUserData("all");
+        tbSystem.setUserData("system");
         tbPlc.setUserData("plc");
         tbCom.setUserData("com");
         tbAlarm.setUserData("alarm");
@@ -95,6 +97,9 @@ public class ActionLogController implements Initializable {
     private void applyFilter(String key) {
         filtered.setPredicate(e -> {
             switch (key) {
+                case "system":
+                    return e.getType() == LogType.SYSTEM
+                            || matches(e, "系统|控制台|参数|配置|操作员|登录|登出|退出|主题|间隔|模式");
                 case "plc":
                     return e.getType() == LogType.PLC || matches(e, "plc|db|进料|出料|步进|伺服|气缸");
                 case "com":

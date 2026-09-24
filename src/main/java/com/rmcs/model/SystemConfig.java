@@ -6,9 +6,11 @@ public class SystemConfig {
     private TestStandard standard = new TestStandard();
     private String comPort = "COM4";
     private int baudRate = 9600;
-    private String plcIp = "192.168.1.10";
+    private String plcIp = "192.168.0.8";
+    private int plcPort = 102;
     private int plcRack = 0;
-    private int plcSlot = 0;
+    // S7-1200 常用 Rack=0 / Slot=1（部分固件用 0），可在参数设定中修改
+    private int plcSlot = 1;
     private int plcProductLen = 256;
     private int plcPollMs = 200;
     private boolean plcMock = false;
@@ -43,6 +45,8 @@ public class SystemConfig {
 
     public String getPlcIp() { return plcIp; }
     public void setPlcIp(String plcIp) { this.plcIp = plcIp; }
+    public int getPlcPort() { return plcPort; }
+    public void setPlcPort(int plcPort) { this.plcPort = plcPort; }
 
     public int getPlcRack() { return plcRack; }
     public void setPlcRack(int plcRack) { this.plcRack = plcRack; }

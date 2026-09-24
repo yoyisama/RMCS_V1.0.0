@@ -5,6 +5,12 @@ import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.factory.S7ConnectorFactory;
 import com.rmcs.model.SystemConfig;
 
+import java.net.ConnectException;
+import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,8 +31,13 @@ public class PlcService {
 
     /** 连续读取失败多少次判定为断线 */
     private static final int MAX_FAIL_BEFORE_OFFLINE = 3;
+    /** S7 通讯默认端口（ISO-on-TCP / RFC1006），可通过参数设定覆盖 */
+    private static final int DEFAULT_S7_PORT = 102;
+    /** TCP 端口探测超时（毫秒），用于给出明确的连接失败原因 */
+    private static final int TCP_PROBE_TIMEOUT_MS = 3000;
 
     private final String ip;
+    private final int port;
     private final int rack;
     private final int slot;
     private final int productNameMaxLen;
@@ -55,15 +66,24 @@ public class PlcService {
             });
 
     private S7Connector connector;
+    /** 实际握手成功的槽号（配置值握手失败时会自动切换 0↔1 再试） */
+    private volatile int activeSlot;
     private volatile boolean connected;
     private volatile boolean polling;
     private int failCount;
     private int lastUpdateFlag = -1;
     private int mockFlag = 0;
     private int mockStep = 0;
+    /** 是否已记录过「数据链路正常」，用于首次成功提示 */
+    private boolean readOkLogged = false;
+    /** 断线自动重连任务（成功或关闭时取消） */
+    private java.util.concurrent.ScheduledFuture<?> reconnectTask;
+    private int reconnectAttempts = 0;
 
     public PlcService(SystemConfig config, PlcListener listener) {
         this.ip = config.getPlcIp();
+        int p = config.getPlcPort();
+        this.port = (p <= 0 || p > 65535) ? DEFAULT_S7_PORT : p;
         this.rack = config.getPlcRack();
         this.slot = config.getPlcSlot();
         this.productNameMaxLen = Math.max(8, config.getPlcProductLen());
@@ -83,6 +103,7 @@ public class PlcService {
         this.startOff = config.getPlcStartOffset();
         this.stopOff = config.getPlcStopOffset();
         this.resetOff = config.getPlcResetOffset();
+        this.activeSlot = this.slot;
         this.listener = listener;
     }
 
@@ -102,20 +123,93 @@ public class PlcService {
     }
 
     private void connectInternal() {
-        try {
-            connector = S7ConnectorFactory.buildTCPConnector()
-                    .withHost(ip)
-                    .withRack(rack)
-                    .withSlot(slot)
-                    .build();
-            connected = true;
-            failCount = 0;
-            listener.onConnected();
-            startPolling();
+        // ① 先探测配置的 IP:端口是否可达，无论成功失败都打印到日志
+        listener.onStatus("网络端口探测：正在测试 " + ip + ":" + port
+                + " 是否可达（超时 " + TCP_PROBE_TIMEOUT_MS + "ms）...");
+        long t0 = System.currentTimeMillis();
+        try (Socket probe = new Socket()) {
+            probe.connect(new InetSocketAddress(ip, port), TCP_PROBE_TIMEOUT_MS);
+            listener.onStatus("网络端口探测：✔ " + ip + ":" + port + " 可连通"
+                    + "（耗时 " + (System.currentTimeMillis() - t0) + "ms），开始 S7 握手");
         } catch (Exception e) {
+            String reason = tcpFailureReason(e);
+            listener.onStatus("网络端口探测：✘ " + reason
+                    + "（耗时 " + (System.currentTimeMillis() - t0) + "ms）");
             connected = false;
-            listener.onConnectionFailed(describe(e));
+            listener.onConnectionFailed(reason);
+            return;
         }
+
+        // ② S7 握手（Rack/Slot 参与 COTP TSAP 计算）
+        listener.onStatus("S7 握手：Rack=" + rack + ", Slot=" + slot + " ...");
+        boolean usedAlt = false;
+        try {
+            open(rack, slot);
+            activeSlot = slot;
+        } catch (Exception first) {
+            // S7-1200 不同固件用 0 或 1，自动切换另一个值再试一次
+            int alt = slot == 0 ? 1 : 0;
+            listener.onStatus("S7 握手：Slot=" + slot + " 失败（" + describe(first)
+                    + "），自动尝试 Slot=" + alt + " ...");
+            try {
+                open(rack, alt);
+                activeSlot = alt;
+                usedAlt = true;
+            } catch (Exception second) {
+                connected = false;
+                listener.onStatus("S7 握手：✘ 失败");
+                listener.onConnectionFailed("S7 握手失败：" + describe(second) + " " + target()
+                        + "（已尝试 Slot=" + slot + " 和 Slot=" + alt + "），请检查："
+                        + "① TIA 中已勾选『允许来自远程对象的 PUT/GET 通信访问』"
+                        + " ② DB 块已取消『优化的块访问』"
+                        + " ③ 机架号是否为 0");
+                return;
+            }
+        }
+        connected = true;
+        failCount = 0;
+        listener.onStatus("S7 握手：✔ 成功（生效 Rack=" + rack + ", Slot=" + activeSlot + "）"
+                + (usedAlt ? " — 已将槽号自动切换为 " + activeSlot + "，建议同步修改参数设定" : ""));
+        listener.onConnected();
+        startPolling();
+    }
+
+    /** 建立 S7 连接（COTP 握手，Rack/Slot 参与 TSAP 计算）。 */
+    private void open(int rack, int slot) throws Exception {
+        connector = S7ConnectorFactory.buildTCPConnector()
+                .withHost(ip)
+                .withPort(port)
+                .withRack(rack)
+                .withSlot(slot)
+                .build();
+    }
+
+    /** 连接目标描述，例如 192.168.0.8:102(Rack=0,Slot=1)。 */
+    private String target() {
+        return "(目标 " + ip + ":" + port + " Rack=" + rack + " Slot=" + activeSlot + ")";
+    }
+
+    /** 把 TCP 探测异常翻译为可读的失败原因。 */
+    private String tcpFailureReason(Exception e) {
+        String t = "目标 " + ip + ":" + port;
+        if (e instanceof UnknownHostException) {
+            return "无法解析主机地址 " + ip + "，请检查 PLC IP 是否填写正确";
+        }
+        if (e instanceof SocketTimeoutException) {
+            return "连接超时（" + t + " 在 " + TCP_PROBE_TIMEOUT_MS + "ms 内无响应）"
+                    + "，请检查：① PLC 已上电 ② 网线/交换机 ③ 本机与 PLC 是否同一网段 ④ S7 端口默认 102";
+        }
+        if (e instanceof ConnectException) {
+            String m = e.getMessage() == null ? "" : e.getMessage();
+            if (m.contains("refused")) {
+                return "连接被拒绝（" + t + "）：端口未开放，请确认 PLC 已启用 PUT/GET 通讯、端口 102 未被防火墙拦截";
+            }
+            return "无法建立 TCP 连接（" + t + "）：" + m;
+        }
+        if (e instanceof NoRouteToHostException) {
+            return "网络不可达（" + t + "）：本机与 PLC 不在同一网段，请检查本机 IP/子网掩码";
+        }
+        return "TCP 连接失败（" + t + "）：" + describe(e);
     }
 
     private void startPolling() {
@@ -131,8 +225,14 @@ public class PlcService {
             int maxOff = Math.max(updateFlagOff, Math.max(sideOff,
                     Math.max(rowOff, Math.max(colOff, yCodeOff))));
             int readLen = Math.max(maxOff + 2, nameOff + 2 + productNameMaxLen);
-            byte[] data = connector.read(DaveArea.DB, dataDb, 0, readLen);
+            // read 参数顺序：(区域, DB号, 读取长度, 起始偏移) —— 长度在前、偏移在后
+            byte[] data = connector.read(DaveArea.DB, dataDb, readLen, 0);
             failCount = 0;
+            if (!readOkLogged) {
+                readOkLogged = true;
+                listener.onStatus("PLC 数据链路正常：已读取 DB" + dataDb + " 共 " + data.length
+                        + " 字节，开始监听数据更新标志");
+            }
             PlcData pd = parse(data);
             if (pd.getUpdateFlag() != lastUpdateFlag) {
                 lastUpdateFlag = pd.getUpdateFlag();
@@ -140,11 +240,55 @@ public class PlcService {
             }
         } catch (Exception e) {
             failCount++;
+            // 首次异常立即打印，便于定位「连接成功但马上断线」
+            if (failCount == 1) {
+                listener.onStatus("PLC 读取异常：" + describe(e) + " " + target()
+                        + "（读取 DB" + dataDb + " 长度 " + Math.max(updateFlagOff + 2, nameOff + 2 + productNameMaxLen)
+                        + " 字节）");
+            }
             if (failCount >= MAX_FAIL_BEFORE_OFFLINE) {
                 connected = false;
                 polling = false;
-                listener.onDisconnected("连续 " + failCount + " 次读取失败：" + describe(e));
+                listener.onDisconnected("连续 " + failCount + " 次读取失败：" + describe(e) + " " + target());
+                startReconnect();
             }
+        }
+    }
+
+    /** 断线后自动重连：每 5 秒尝试一次，成功后自动重新轮询。 */
+    private void startReconnect() {
+        if (mock || reconnectTask != null) return;
+        reconnectTask = scheduler.scheduleWithFixedDelay(this::tryReconnect, 5000, 5000, TimeUnit.MILLISECONDS);
+    }
+
+    private void tryReconnect() {
+        if (connected) {
+            cancelReconnect();
+            return;
+        }
+        try {
+            open(rack, activeSlot);
+            connected = true;
+            failCount = 0;
+            readOkLogged = false;
+            cancelReconnect();
+            listener.onStatus("PLC 自动重连成功 " + target());
+            listener.onConnected();
+            startPolling();
+        } catch (Exception e) {
+            reconnectAttempts++;
+            // 首次失败打印原因，后续静默重试，避免刷屏
+            if (reconnectAttempts == 1) {
+                listener.onStatus("PLC 自动重连失败：" + describe(e) + " " + target() + "（每 5 秒重试）");
+            }
+        }
+    }
+
+    private void cancelReconnect() {
+        if (reconnectTask != null) {
+            reconnectTask.cancel(false);
+            reconnectTask = null;
+            reconnectAttempts = 0;
         }
     }
 
@@ -201,8 +345,11 @@ public class PlcService {
     public boolean isConnected() { return connected; }
 
     public String getIp() { return ip; }
+    public int getPort() { return port; }
     public int getRack() { return rack; }
     public int getSlot() { return slot; }
+    /** 实际握手成功使用的槽号（可能与配置值不同）。 */
+    public int getActiveSlot() { return activeSlot; }
     public int getProductLen() { return productNameMaxLen; }
     public boolean isMock() { return mock; }
     public int getDataDb() { return dataDb; }
@@ -212,6 +359,7 @@ public class PlcService {
     public boolean matchesConfig(SystemConfig cfg) {
         return cfg != null
                 && cfg.getPlcIp().equals(ip)
+                && cfg.getPlcPort() == port
                 && cfg.getPlcRack() == rack
                 && cfg.getPlcSlot() == slot
                 && cfg.getPlcProductLen() == productNameMaxLen
@@ -234,6 +382,7 @@ public class PlcService {
 
     public void shutdown() {
         polling = false;
+        cancelReconnect();
         try {
             scheduler.submit(() -> {
                 if (connector != null) {
@@ -281,8 +430,17 @@ public class PlcService {
         listener.onData(pd);
     }
 
+    /** 异常详情：类型 + 消息 + 直接原因，便于定位。 */
     private String describe(Exception e) {
+        StringBuilder sb = new StringBuilder(e.getClass().getSimpleName());
         String m = e.getMessage();
-        return (m == null || m.isBlank()) ? e.getClass().getSimpleName() : m;
+        if (m != null && !m.isBlank()) sb.append(": ").append(m);
+        Throwable c = e.getCause();
+        if (c != null) {
+            sb.append(" | 原因: ").append(c.getClass().getSimpleName());
+            String cm = c.getMessage();
+            if (cm != null && !cm.isBlank()) sb.append(": ").append(cm);
+        }
+        return sb.toString();
     }
 }

@@ -14,4 +14,7 @@ public interface PlcListener {
 
     /** PLC 数据更新标志变化（新测点就绪），携带最新解析数据 */
     void onData(PlcData data);
+
+    /** 连接过程状态提示（端口探测 / 握手进度等），默认忽略 */
+    default void onStatus(String msg) { }
 }

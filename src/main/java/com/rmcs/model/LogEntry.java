@@ -7,7 +7,8 @@ import java.time.format.DateTimeFormatter;
 public class LogEntry {
 
     /** 日志类型：决定日志模块的颜色与样式。 */
-    public enum LogType { INFO, PLC, COM, SUCCESS, WARNING, ERROR }
+    /** 日志类型：SYSTEM=系统日志（程序/配置/会话类），PLC/COM=通讯类，其余为结果类。 */
+    public enum LogType { INFO, SYSTEM, PLC, COM, SUCCESS, WARNING, ERROR }
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
 

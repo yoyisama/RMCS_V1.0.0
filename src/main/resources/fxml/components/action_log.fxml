@@ -19,6 +19,7 @@
         <Region HBox.hgrow="ALWAYS"/>
         <HBox styleClass="seg-group" spacing="2" alignment="CENTER">
             <ToggleButton fx:id="tbAll" text="全部" toggleGroup="$logFilterGroup" styleClass="seg-btn" selected="true"/>
+            <ToggleButton fx:id="tbSystem" text="系统" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
             <ToggleButton fx:id="tbPlc" text="PLC (DB)" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
             <ToggleButton fx:id="tbCom" text="COM4 电阻计" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>
             <ToggleButton fx:id="tbAlarm" text="报警" toggleGroup="$logFilterGroup" styleClass="seg-btn"/>

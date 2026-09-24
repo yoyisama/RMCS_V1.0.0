@@ -20,6 +20,7 @@ public class StandardConfigController {
     @FXML private TextField tfPlcSlot;
     @FXML private TextField tfPlcLen;
     @FXML private TextField tfPlcModel;
+    @FXML private TextField tfPlcPort;
     @FXML private CheckBox chkPlcMock;
     @FXML private ComboBox<String> cbComPort;
     @FXML private ComboBox<String> cbBaud;
@@ -69,6 +70,7 @@ public class StandardConfigController {
         tfPlcSlot.setText(String.valueOf(cfg.getPlcSlot()));
         tfPlcLen.setText(String.valueOf(cfg.getPlcProductLen()));
         tfPlcModel.setText(cfg.getPlcModel());
+        tfPlcPort.setText(String.valueOf(cfg.getPlcPort()));
         chkPlcMock.setSelected(cfg.isPlcMock());
 
         tfPlcDataDb.setText(String.valueOf(cfg.getPlcDataDb()));
@@ -98,12 +100,13 @@ public class StandardConfigController {
         tfLowerDev.setText("0.010");
         cbComPort.setValue("COM4");
         cbBaud.setValue("9600");
-        tfPlcIp.setText("192.168.1.10");
+        tfPlcIp.setText("192.168.0.8");
         tfInterval.setText("60000");
         tfPlcRack.setText("0");
-        tfPlcSlot.setText("0");
+        tfPlcSlot.setText("1");
         tfPlcLen.setText("256");
         tfPlcModel.setText("S7-1200");
+        tfPlcPort.setText("102");
         chkPlcMock.setSelected(false);
 
         tfPlcDataDb.setText("36");
@@ -139,6 +142,7 @@ public class StandardConfigController {
         int rack = (int) parse(tfPlcRack.getText(), 0);
         int slot = (int) parse(tfPlcSlot.getText(), 0);
         int plen = (int) parse(tfPlcLen.getText(), 256);
+        int port = (int) parse(tfPlcPort.getText(), 102);
 
         int dataDb = (int) parse(tfPlcDataDb.getText(), 36);
         int heartbeatOff = (int) parse(tfPlcHeartbeatOffset.getText(), 0);
@@ -171,6 +175,10 @@ public class StandardConfigController {
             showError("产品名最大长度需在 2~256 字节之间");
             return;
         }
+        if (port < 1 || port > 65535) {
+            showError("PLC 端口需在 1~65535 之间（S7 默认 102）");
+            return;
+        }
         if (dataDb < 1 || dataDb > 65535 || controlDb < 1 || controlDb > 65535) {
             showError("DB 号需在 1~65535 之间");
             return;
@@ -192,6 +200,7 @@ public class StandardConfigController {
             cfg.setComPort(cbComPort.getValue());
             try { cfg.setBaudRate(Integer.parseInt(cbBaud.getValue())); } catch (Exception ignored) { }
             cfg.setPlcIp(tfPlcIp.getText());
+            cfg.setPlcPort(port);
             cfg.setPollIntervalMs(interval);
             cfg.setPlcRack(rack);
             cfg.setPlcSlot(slot);

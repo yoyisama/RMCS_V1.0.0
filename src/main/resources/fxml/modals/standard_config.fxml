@@ -94,10 +94,14 @@
                         <CheckBox fx:id="chkPlcMock" text="PLC 离线模拟模式" styleClass="chk"/>
                         <Label text="(无硬件时勾选)" styleClass="txt-muted"/>
                     </HBox>
-                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="4">
                         <Label text="PLC 型号" styleClass="mini-label"/>
                         <TextField fx:id="tfPlcModel" editable="false" focusTraversable="false"
                                    text="S7-1200" style="-fx-opacity: 0.85;"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <Label text="PLC 端口 (S7 默认 102)" styleClass="mini-label"/>
+                        <TextField fx:id="tfPlcPort"/>
                     </VBox>
                 </GridPane>
 

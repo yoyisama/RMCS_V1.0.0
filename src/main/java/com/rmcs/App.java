@@ -22,7 +22,7 @@ public class App extends Application {
     private static final double BASE_HEIGHT = 800;
 
     /** 构建标记（区分新旧实例窗口） */
-    private static final String BUILD_TAG = "20260923-1383";
+    private static final String BUILD_TAG = "20260924-1392";
 
     private Stage stage;
     private Runnable cleanup;
@@ -50,7 +50,7 @@ public class App extends Application {
             Rectangle2D b = Screen.getPrimary().getVisualBounds();
             switchScene(root, "/css/login.css",
                     Math.min(820, b.getWidth() - 8),
-                    Math.min(600, b.getHeight() - 8));
+                    Math.min(600, b.getHeight() - 8), false);
         } catch (Exception e) {
             throw new RuntimeException("无法加载登录页", e);
         }
@@ -70,9 +70,10 @@ public class App extends Application {
             applyTheme(root);
             // 主控台最小尺寸：舒适值 1200×680，但绝不超过屏幕可视区（否则窗口被最小值撑出屏幕）
             Rectangle2D b = Screen.getPrimary().getVisualBounds();
+            // 登录后主控台直接最大化铺满屏幕：布局随窗口自适应，任何分辨率都不再裁切
             switchScene(root, "/css/main.css",
                     Math.min(1200, b.getWidth() - 8),
-                    Math.min(680, b.getHeight() - 8));
+                    Math.min(680, b.getHeight() - 8), true);
             // 内联主题着色：等场景挂到窗口后跨两帧执行，确保所有控件就位；
             // 再延迟 600ms 补一轮，捕获异步加载/动态创建的节点
             Platform.runLater(() -> Platform.runLater(() ->
@@ -155,7 +156,7 @@ public class App extends Application {
         return Screen.getPrimary().getVisualBounds();
     }
 
-    private void switchScene(Parent root, String cssPath, double minW, double minH) {
+    private void switchScene(Parent root, String cssPath, double minW, double minH, boolean maximize) {
         // 尺寸基准 = 窗口当前所在屏幕（多显示器下 getPrimary() 可能是另一块更大的屏，
         // 按 primary 计算会导致窗口比所在屏幕宽，右侧被屏幕边缘截断）
         Rectangle2D bounds = currentScreen();
@@ -178,6 +179,18 @@ public class App extends Application {
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
         bindFullScreen(scene);
         stage.setScene(scene);
+
+        if (maximize) {
+            // 主控台：最大化铺满屏幕，布局(HBox/右面板)按宽度监听器自适应，
+            // 不再手动计算窗口尺寸，彻底规避 DPI/多屏导致的裁切
+            Platform.runLater(() -> {
+                stage.setFullScreen(false);
+                stage.setMaximized(true);
+                root.applyCss();
+                root.layout();
+            });
+            return;
+        }
 
         // 关键：窗口尺寸设置延迟到下一帧——全屏/最大化退出存在「还原到旧尺寸」的
         // 内部流程，同步调用 setWidth/Height 会被其覆盖（正是首帧错、拖动后对的成因）

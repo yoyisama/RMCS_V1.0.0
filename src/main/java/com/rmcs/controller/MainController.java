@@ -184,6 +184,7 @@ public class MainController implements MeasurementListener {
             footerBarController.setConfig(cfg.getComPort(), cfg.getPollIntervalMs());
             footerBarController.setBaudRate(cfg.getBaudRate());
             footerBarController.setOnReconnect(this::reconnectMeter);
+            footerBarController.setOnPlcReconnect(this::reconnectPlc);
         }
 
         if (rightPanelController != null) {
@@ -200,7 +201,7 @@ public class MainController implements MeasurementListener {
             rightPanelController.setOnResetCounter(() -> {
                 status.resetCounters();
                 rightPanelController.refreshStatus();
-                appendLog(LogType.INFO, "操作员清零完成数量与运行时长计数器");
+                appendLog(LogType.SYSTEM, "操作员清零完成数量与运行时长计数器");
             });
         }
 
@@ -217,7 +218,7 @@ public class MainController implements MeasurementListener {
         actionLogY2Controller.setOnOpen(this::openLogQuery);
         startPlcService();
 
-        appendLog(LogType.INFO, "控制台已加载 · 操作员=" + (user == null ? "匿名" : user.getName()));
+        appendLog(LogType.SYSTEM, "控制台已加载 · 操作员=" + (user == null ? "匿名" : user.getName()));
 
         statusTick = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             if (status.getStatus() == ProductionStatus.MachineStatus.RUNNING) {
@@ -321,6 +322,16 @@ public class MainController implements MeasurementListener {
         if (dataHistoryY2Controller != null) dataHistoryY2Controller.clearAll();
     }
 
+    /** 手动重连 PLC（点击底部「PLC通讯」状态触发）：重建 S7 连接。 */
+    public void reconnectPlc() {
+        appendLog(LogType.PLC, "手动重连 PLC " + (cfg.isPlcMock() ? "(离线模拟)" : cfg.getPlcIp()) + " ...");
+        if (plcService != null) {
+            plcService.shutdown();
+            plcService = null;
+        }
+        startPlcService();
+    }
+
     /** 启动 PLC 通讯服务（或离线模拟），并注册数据回调。 */
     private void startPlcService() {
         if (cfg == null) return;
@@ -330,7 +341,9 @@ public class MainController implements MeasurementListener {
                             if (footerBarController != null) footerBarController.setPlcOnline(true);
                             appendLog(LogType.PLC, cfg.isPlcMock()
                                     ? "PLC 离线模拟模式已启动（不连接真实设备）"
-                                    : "PLC(" + cfg.getPlcIp() + ") 连接成功");
+                                    : "PLC(" + cfg.getPlcIp() + ":" + cfg.getPlcPort()
+                                    + ") 连接成功 (Rack=" + cfg.getPlcRack()
+                                    + ", Slot=" + plcService.getActiveSlot() + ")");
                         });
                     }
                     @Override public void onConnectionFailed(String reason) {
@@ -348,7 +361,14 @@ public class MainController implements MeasurementListener {
                     @Override public void onData(PlcData data) {
                         Platform.runLater(() -> onPlcData(data));
                     }
+                    @Override public void onStatus(String msg) {
+                        appendLog(LogType.PLC, msg);
+                    }
                 });
+        appendLog(LogType.PLC, cfg.isPlcMock()
+                ? "PLC 离线模拟模式启动中（不连接真实设备）"
+                : "正在连接 PLC " + cfg.getPlcIp() + ":" + cfg.getPlcPort()
+                + " (Rack=" + cfg.getPlcRack() + ", Slot=" + cfg.getPlcSlot() + ") ...");
         plcService.connect();
     }
 
@@ -425,7 +445,7 @@ public class MainController implements MeasurementListener {
         cfg.setPollIntervalMs(interval);
         if (meterService != null) meterService.getConfig().setPollIntervalMs(interval);
         if (footerBarController != null) footerBarController.setConfig(cfg.getComPort(), interval);
-        appendLog(LogType.INFO, "采样间隔已更新为 " + (interval / 1000.0) + "秒/次");
+        appendLog(LogType.SYSTEM, "采样间隔已更新为 " + (interval / 1000.0) + "秒/次");
         if (meterService == null) return;
         if (rightPanelController != null && !rightPanelController.isAuto()) {
             meterService.stopPolling();
@@ -442,7 +462,7 @@ public class MainController implements MeasurementListener {
         if (meterService == null) return;
         if (auto) {
             meterService.startPolling();
-            appendLog(LogType.INFO, "已切换为自动模式，恢复定时采集");
+            appendLog(LogType.SYSTEM, "已切换为自动模式，恢复定时采集");
         } else {
             meterService.stopPolling();
             appendLog(LogType.WARNING, "已切换为手动模式，仅保留「单次获取」");
@@ -656,7 +676,7 @@ public class MainController implements MeasurementListener {
                 if (footerBarController != null) {
                     footerBarController.setConfig(cfg.getComPort(), cfg.getPollIntervalMs());
                 }
-                appendLog(LogType.INFO, String.format(
+                appendLog(LogType.SYSTEM, String.format(
                         "参数已保存 · 标准=%.3fΩ 区间=[%.3f, %.3f] 串口=%s %dbps 间隔=%dms",
                         cfg.getStandard().getStandardValue(),
                         cfg.getStandard().getLowerLimit(), cfg.getStandard().getUpperLimit(),
@@ -688,7 +708,7 @@ public class MainController implements MeasurementListener {
     }
 
     public void openLogQuery() {
-        showModal("log_query.fxml", "日志查询", 800, 540, (LogQueryController c) -> {
+        showModal("log_query.fxml", "日志查询", 880, 560, (LogQueryController c) -> {
             c.bind(sharedLogs);
             c.setOnCleared(sharedLogs::clear);
         });
@@ -728,6 +748,7 @@ public class MainController implements MeasurementListener {
     }
 
     public void logout() {
+        appendLog(LogType.SYSTEM, "操作员已退出登录，正在返回登录页");
         releaseResources();
         if (app != null) app.showLogin();
     }

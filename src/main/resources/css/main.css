@@ -501,6 +501,7 @@
 .log-line .log-msg  { -fx-fill: #e2e8f0; }
 .log-line .log-tag  { -fx-font-weight: bold; }
 .log-info    .log-tag { -fx-fill: #38bdf8; }
+.log-system  .log-tag { -fx-fill: #94a3b8; }
 .log-plc     .log-tag { -fx-fill: #a78bfa; }
 .log-com     .log-tag { -fx-fill: #22d3ee; }
 .log-success .log-tag { -fx-fill: #4ade80; }
@@ -514,6 +515,7 @@
 .root-light .log-line .log-time { -fx-fill: #94a3b8; }
 .root-light .log-line .log-msg  { -fx-fill: #1e293b; }
 .root-light .log-info    .log-tag { -fx-fill: #0284c7; }
+.root-light .log-system  .log-tag { -fx-fill: #475569; }
 .root-light .log-plc     .log-tag { -fx-fill: #7c3aed; }
 .root-light .log-com     .log-tag { -fx-fill: #0891b2; }
 .root-light .log-success .log-tag { -fx-fill: #16a34a; }
@@ -534,6 +536,8 @@
 .root-light .log-prompt { -fx-text-fill: #0284c7; }
 .log-info    .label { -fx-text-fill: -txt; }
 .log-info    .log-tag { -fx-text-fill: -accent; -fx-font-weight: bold; }
+.log-system  .label { -fx-text-fill: -txt; }
+.log-system  .log-tag { -fx-text-fill: -txt-sec; -fx-font-weight: bold; }
 .log-plc     .label { -fx-text-fill: -txt; }
 .log-plc     .log-tag { -fx-text-fill: -violet; -fx-font-weight: bold; }
 .log-com     .label { -fx-text-fill: -txt; }

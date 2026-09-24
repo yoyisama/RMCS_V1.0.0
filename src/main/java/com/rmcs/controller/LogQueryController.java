@@ -35,12 +35,17 @@ public class LogQueryController {
 
     @FXML
     public void initialize() {
-        cbType.getItems().addAll("全部", "信息 INFO", "PLC", "串口 COM", "成功 SUCCESS", "警告 WARNING", "错误 ERROR");
+        cbType.getItems().addAll("全部", "信息 INFO", "系统 SYSTEM", "PLC", "串口 COM", "成功 SUCCESS", "警告 WARNING", "错误 ERROR");
         cbType.getSelectionModel().selectFirst();
 
         colTime.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFormattedTime()));
         colType.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getType().name()));
         colMessage.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getMessage()));
+        // 时间/类型列定宽，把剩余宽度全部让给「内容」列
+        colTime.setPrefWidth(84);
+        colTime.setMaxWidth(96);
+        colType.setPrefWidth(96);
+        colType.setMaxWidth(110);
         colType.setCellFactory(c -> new TextFieldTableCell<LogEntry, String>() {
             @Override
             public void updateItem(String item, boolean empty) {
@@ -48,6 +53,40 @@ public class LogQueryController {
                 if (empty || item == null) { setText(null); setStyle(""); return; }
                 setText(item);
                 setStyle(colorOf(item));
+            }
+        });
+        // 内容列：自动换行 + 行高自适应，完整显示长消息不再截断
+        colMessage.setCellFactory(col -> new TableCell<LogEntry, String>() {
+            private final javafx.scene.control.Label lbl = new javafx.scene.control.Label();
+            {
+                lbl.setWrapText(true);
+                lbl.setMaxWidth(Double.MAX_VALUE);
+                lbl.getStyleClass().add("log-msg-wrap");
+                setContentDisplay(javafx.scene.control.ContentDisplay.GRAPHIC_ONLY);
+                setPrefWidth(0);
+                // 让单元格随列宽换行，行高由内容撑开
+                prefWidthProperty().bind(col.widthProperty().subtract(16));
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); return; }
+                lbl.setText(item);
+                setGraphic(lbl);
+            }
+        });
+        // 整行悬浮提示：鼠标停留即可看到完整内容
+        table.setRowFactory(tv -> new TableRow<LogEntry>() {
+            private final Tooltip tip = new Tooltip();
+            {
+                setTooltip(tip);
+                tip.setWrapText(true);
+                tip.setMaxWidth(560);
+            }
+            @Override
+            protected void updateItem(LogEntry item, boolean empty) {
+                super.updateItem(item, empty);
+                tip.setText(empty || item == null ? null : item.getMessage());
             }
         });
 
@@ -124,7 +163,7 @@ public class LogQueryController {
     private void refreshStats() {
         if (filtered == null) return;
         lblTotal.setText("查询结果: " + filtered.size() + " 条");
-        lblInfo.setText("信息 " + count("INFO") + " · 成功 " + count("SUCCESS"));
+        lblInfo.setText("信息 " + count("INFO") + " · 系统 " + count("SYSTEM") + " · 成功 " + count("SUCCESS"));
         lblWarn.setText("警告 " + count("WARNING"));
         lblErrorCount.setText("错误 " + count("ERROR"));
     }
@@ -136,6 +175,7 @@ public class LogQueryController {
     private static String colorOf(String type) {
         switch (type) {
             case "INFO":    return "-fx-text-fill: #38bdf8;";
+            case "SYSTEM":  return "-fx-text-fill: #94a3b8;";
             case "PLC":     return "-fx-text-fill: #a855f7;";
             case "COM":     return "-fx-text-fill: #22d3ee;";
             case "SUCCESS": return "-fx-text-fill: #22c55e;";
