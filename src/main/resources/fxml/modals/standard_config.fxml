@@ -147,6 +147,14 @@
                         <Label text="Y1/Y2 码偏移 (字节)" styleClass="mini-label"/>
                         <TextField fx:id="tfPlcYCodeOffset"/>
                     </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                        <Label text="矩阵行数 (暂定10)" styleClass="mini-label"/>
+                        <TextField fx:id="tfMatrixRows"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <Label text="矩阵列数 (暂定3)" styleClass="mini-label"/>
+                        <TextField fx:id="tfMatrixCols"/>
+                    </VBox>
                 </GridPane>
 
                 <!-- 节4：PLC 控制区配置 (上位机 → PLC) -->

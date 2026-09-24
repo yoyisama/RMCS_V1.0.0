@@ -405,13 +405,14 @@ public class PlcService {
     }
 
     private void mockTick() {
-        // 顺序：Y1/Y2 × 列1/2 × 左/右 × 行1..15，模拟生产线每个测点就绪
-        int total = 60; // 每侧 60 个测点（2列×2左右×15行）
-        int idx = mockStep % (total * 2);
-        int sideIdx = idx / total;
-        int within = idx % total;
-        int row = within / 4 + 1;
-        int rem = within % 4;
+        // 顺序：Y1/Y2 × 列1..N × 左/右 × 行1..M，模拟生产线每个测点就绪（规模随参数设定）
+        int perSide = com.rmcs.model.WorkPos.perSide();
+        int idx = mockStep % (perSide * 2);
+        int sideIdx = idx / perSide;
+        int within = idx % perSide;
+        int perRow = com.rmcs.model.WorkPos.getCols() * 2;
+        int row = within / perRow + 1;
+        int rem = within % perRow;
         int col = rem / 2 + 1;
         String lrStr = (rem % 2 == 0) ? "左" : "右";
         String sideStr = sideIdx == 0 ? "Y1" : "Y2";

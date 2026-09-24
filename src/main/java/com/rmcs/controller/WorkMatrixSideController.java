@@ -45,6 +45,8 @@ public class WorkMatrixSideController implements Initializable {
     }
 
     private void build() {
+        int rows = WorkPos.getRows();
+        int cols = WorkPos.getCols();
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
         grid.getRowConstraints().clear();
@@ -52,39 +54,39 @@ public class WorkMatrixSideController implements Initializable {
 
         ColumnConstraints c0 = new ColumnConstraints(); c0.setPercentWidth(18);
         grid.getColumnConstraints().add(c0);
-        for (int i = 0; i < 4; i++) {
+        double dataW = (100.0 - 18) / (cols * 2);
+        for (int i = 0; i < cols * 2; i++) {
             ColumnConstraints c = new ColumnConstraints();
-            c.setPercentWidth(20.5);
+            c.setPercentWidth(dataW);
             grid.getColumnConstraints().add(c);
         }
 
-        // 行高全部按百分比划分（fitToHeight 下网格高度恒等于视口），17 行无滚动完整显示
-        RowConstraints h1 = new RowConstraints(); h1.setPercentHeight(100.0 / 17 * 1.2);
-        RowConstraints h2 = new RowConstraints(); h2.setPercentHeight(100.0 / 17 * 0.9);
+        // 行高全部按百分比划分（fitToHeight 下网格高度恒等于视口），无滚动完整显示
+        RowConstraints h1 = new RowConstraints(); h1.setPercentHeight(100.0 / (rows + 2) * 1.2);
+        RowConstraints h2 = new RowConstraints(); h2.setPercentHeight(100.0 / (rows + 2) * 0.9);
         grid.getRowConstraints().addAll(h1, h2);
-        for (int i = 0; i < WorkPos.ROWS; i++) {
+        for (int i = 0; i < rows; i++) {
             RowConstraints rc = new RowConstraints();
-            rc.setPercentHeight(100.0 / 17);
+            rc.setPercentHeight(100.0 / (rows + 2));
             grid.getRowConstraints().add(rc);
         }
 
-        // 表头左上角：Y1 → 左列，Y2 → 右列
-        addHead("Y1".equals(side) ? "左列" : "右列", 0, 0, 1);
-        addHead("第一列", 1, 0, 2);
-        addHead("第二列", 3, 0, 2);
+        // 表头：左上角侧别标识 + 每列跨「左/右」两个子列
+        addHead(side, 0, 0, 1);
+        for (int c = 1; c <= cols; c++) {
+            addHead("第" + WorkPos.cnCol(c) + "列", (c - 1) * 2 + 1, 0, 2);
+            addHead("左", (c - 1) * 2 + 1, 1, 1);
+            addHead("右", (c - 1) * 2 + 2, 1, 1);
+        }
         addHead("行", 0, 1, 1);
-        addHead("左", 1, 1, 1);
-        addHead("右", 2, 1, 1);
-        addHead("左", 3, 1, 1);
-        addHead("右", 4, 1, 1);
 
-        for (int row = 1; row <= WorkPos.ROWS; row++) {
+        for (int row = 1; row <= rows; row++) {
             Label rowLbl = new Label(WorkPos.rowName(row));
             rowLbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             rowLbl.getStyleClass().add("matrix-head");
             grid.add(rowLbl, 0, row + 1);
 
-            for (int col = 1; col <= 2; col++) {
+            for (int col = 1; col <= cols; col++) {
                 for (String lr : new String[]{"左", "右"}) {
                     WorkPos pos = new WorkPos(side, col, lr, row);
                     Label cell = new Label("---");
@@ -96,6 +98,12 @@ public class WorkMatrixSideController implements Initializable {
             }
         }
         built = true;
+    }
+
+    /** 矩阵规模（行/列数）变更后调用：重建网格。 */
+    public void rebuild() {
+        built = false;
+        if (side != null) build();
     }
 
     private void addHead(String text, int col, int row, int span) {
@@ -130,9 +138,9 @@ public class WorkMatrixSideController implements Initializable {
 
     public void clearAll() {
         if (side == null) return;
-        for (int col = 1; col <= 2; col++) {
+        for (int col = 1; col <= WorkPos.getCols(); col++) {
             for (String lr : new String[]{"左", "右"}) {
-                for (int row = 1; row <= WorkPos.ROWS; row++) {
+                for (int row = 1; row <= WorkPos.getRows(); row++) {
                     setCell(new WorkPos(side, col, lr, row), new MatrixCell(null, null, false));
                 }
             }

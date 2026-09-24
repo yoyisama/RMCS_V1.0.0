@@ -206,6 +206,7 @@ public class MainController implements MeasurementListener {
         }
 
         // Y1/Y2 两个 Tab 各自注入单侧作业矩阵、单侧数据履历，并共享同一份系统日志
+        com.rmcs.model.WorkPos.setGrid(cfg.getMatrixRows(), cfg.getMatrixCols());
         workMatrixY1Controller.setSide("Y1");
         workMatrixY2Controller.setSide("Y2");
         dataHistoryY1Controller.setSide("Y1");
@@ -388,6 +389,14 @@ public class MainController implements MeasurementListener {
         if (workMatrixY1Controller != null) workMatrixY1Controller.setProductName(currentProductName);
         if (workMatrixY2Controller != null) workMatrixY2Controller.setProductName(currentProductName);
 
+        // 每收到一个新测点立即回写「完成标志」DB37.DBW0=1（PLC 收到后自动清零并下发下一点）；
+        // 即使暂无电阻计读数也必须回写，否则 PLC 会停在当前测点不再推进
+        plcWrite(cfg.getPlcControlDb(), cfg.getPlcAckOffset(), 1);
+        if (!cfg.isPlcMock()) {
+            appendLog(LogType.PLC, "已回写完成标志 DB" + cfg.getPlcControlDb()
+                    + ".DBW" + cfg.getPlcAckOffset() + "=1");
+        }
+
         if (lastMeterValue == null) {
             appendLog(LogType.WARNING, "PLC 上报新测点（" + data.getSide() + " "
                     + data.getCol() + "列" + data.getLr() + WorkPos.rowName(data.getRow())
@@ -417,9 +426,6 @@ public class MainController implements MeasurementListener {
 
         status.incrementCompleted();
         if (rightPanelController != null) rightPanelController.refreshStatus();
-
-        // 回写「完成一次记录的标志位」（PLC 自动清零）
-        plcWrite(cfg.getPlcControlDb(), cfg.getPlcAckOffset(), 1);
 
         appendLog(pass ? LogType.SUCCESS : LogType.WARNING,
                 String.format("[PLC采集] %s %s 阻值: %.3fΩ (%s)",
@@ -692,6 +698,15 @@ public class MainController implements MeasurementListener {
                             + (cfg.isPlcMock() ? "(离线模拟)" : cfg.getPlcIp()) + " ...");
                     if (plcService != null) plcService.shutdown();
                     startPlcService();
+                }
+                // 作业矩阵规模（行/列数）变更：更新全局规模并重建两块矩阵
+                if (cfg.getMatrixRows() != com.rmcs.model.WorkPos.getRows()
+                        || cfg.getMatrixCols() != com.rmcs.model.WorkPos.getCols()) {
+                    com.rmcs.model.WorkPos.setGrid(cfg.getMatrixRows(), cfg.getMatrixCols());
+                    if (workMatrixY1Controller != null) workMatrixY1Controller.rebuild();
+                    if (workMatrixY2Controller != null) workMatrixY2Controller.rebuild();
+                    appendLog(LogType.SYSTEM, "作业矩阵已调整为 "
+                            + cfg.getMatrixRows() + " 行 × " + cfg.getMatrixCols() + " 列（左右）");
                 }
             });
         });

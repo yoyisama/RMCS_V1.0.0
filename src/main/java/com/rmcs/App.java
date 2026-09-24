@@ -22,7 +22,7 @@ public class App extends Application {
     private static final double BASE_HEIGHT = 800;
 
     /** 构建标记（区分新旧实例窗口） */
-    private static final String BUILD_TAG = "20260924-1392";
+    private static final String BUILD_TAG = "20260924-1393";
 
     private Stage stage;
     private Runnable cleanup;

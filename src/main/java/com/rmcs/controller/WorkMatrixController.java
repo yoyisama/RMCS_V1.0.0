@@ -51,7 +51,7 @@ public class WorkMatrixController implements Initializable {
         // 行：表头2行固定 + 15数据行固定高度，超出后可滚动
         grid.getRowConstraints().addAll(new RowConstraints(28, 28, 28),
                                         new RowConstraints(28, 28, 28));
-        for (int i = 0; i < WorkPos.ROWS; i++) {
+        for (int i = 0; i < WorkPos.getRows(); i++) {
             grid.getRowConstraints().add(new RowConstraints(34, 34, 34));
         }
 
@@ -72,10 +72,10 @@ public class WorkMatrixController implements Initializable {
         // 竖线分隔（跨所有行）
         Region divider = new Region();
         divider.getStyleClass().add("band-divider");
-        grid.add(divider, 5, 0, 1, WorkPos.ROWS + 2);
+        grid.add(divider, 5, 0, 1, WorkPos.getRows() + 2);
 
         // ---- 数据：Y1 块(col0-4) / Y2 块(col6-10) ----
-        for (int row = 1; row <= WorkPos.ROWS; row++) {
+        for (int row = 1; row <= WorkPos.getRows(); row++) {
             int gRow = row + 1;
             Label y1Lbl = new Label(WorkPos.rowName(row));
             y1Lbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -89,7 +89,7 @@ public class WorkMatrixController implements Initializable {
 
             for (String side : new String[]{"Y1", "Y2"}) {
                 int base = "Y1".equals(side) ? 0 : 6;
-                for (int col = 1; col <= 2; col++) {
+                for (int col = 1; col <= WorkPos.getCols(); col++) {
                     for (String lr : new String[]{"左", "右"}) {
                         WorkPos pos = new WorkPos(side, col, lr, row);
                         Label cell = new Label("---");
@@ -134,9 +134,9 @@ public class WorkMatrixController implements Initializable {
 
     public void clearAll() {
         for (String side : new String[]{"Y1", "Y2"}) {
-            for (int col = 1; col <= 2; col++) {
+            for (int col = 1; col <= WorkPos.getCols(); col++) {
                 for (String lr : new String[]{"左", "右"}) {
-                    for (int row = 1; row <= WorkPos.ROWS; row++) {
+                    for (int row = 1; row <= WorkPos.getRows(); row++) {
                         setCell(new WorkPos(side, col, lr, row), new MatrixCell(null, null, false));
                     }
                 }

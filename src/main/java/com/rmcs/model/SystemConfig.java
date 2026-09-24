@@ -13,6 +13,9 @@ public class SystemConfig {
     private int plcSlot = 1;
     private int plcProductLen = 256;
     private int plcPollMs = 200;
+    // 作业矩阵规模（按对接图暂定 10 行 × 3 列）
+    private int matrixRows = 10;
+    private int matrixCols = 3;
     private boolean plcMock = false;
     // PLC 型号（当前固定 S7-1200，保留字段便于后续扩展）
     private String plcModel = "S7-1200";
@@ -59,6 +62,11 @@ public class SystemConfig {
 
     public int getPlcPollMs() { return plcPollMs; }
     public void setPlcPollMs(int plcPollMs) { this.plcPollMs = plcPollMs; }
+
+    public int getMatrixRows() { return matrixRows; }
+    public void setMatrixRows(int matrixRows) { this.matrixRows = matrixRows; }
+    public int getMatrixCols() { return matrixCols; }
+    public void setMatrixCols(int matrixCols) { this.matrixCols = matrixCols; }
 
     public boolean isPlcMock() { return plcMock; }
     public void setPlcMock(boolean plcMock) { this.plcMock = plcMock; }

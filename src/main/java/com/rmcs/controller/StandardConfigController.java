@@ -44,6 +44,10 @@ public class StandardConfigController {
     @FXML private TextField tfPlcStopOffset;
     @FXML private TextField tfPlcResetOffset;
 
+    // 作业矩阵规模
+    @FXML private TextField tfMatrixRows;
+    @FXML private TextField tfMatrixCols;
+
     private SystemConfig cfg;
     private Runnable onSaved;
 
@@ -88,6 +92,9 @@ public class StandardConfigController {
         tfPlcStopOffset.setText(String.valueOf(cfg.getPlcStopOffset()));
         tfPlcResetOffset.setText(String.valueOf(cfg.getPlcResetOffset()));
 
+        tfMatrixRows.setText(String.valueOf(cfg.getMatrixRows()));
+        tfMatrixCols.setText(String.valueOf(cfg.getMatrixCols()));
+
         refreshRange();
     }
 
@@ -124,6 +131,9 @@ public class StandardConfigController {
         tfPlcStopOffset.setText("2");
         tfPlcResetOffset.setText("4");
 
+        tfMatrixRows.setText("10");
+        tfMatrixCols.setText("3");
+
         refreshRange();
     }
 
@@ -159,6 +169,9 @@ public class StandardConfigController {
         int stopOff = (int) parse(tfPlcStopOffset.getText(), 2);
         int resetOff = (int) parse(tfPlcResetOffset.getText(), 4);
 
+        int mRows = (int) parse(tfMatrixRows.getText(), 10);
+        int mCols = (int) parse(tfMatrixCols.getText(), 3);
+
         if (Double.isNaN(std) || Double.isNaN(up) || Double.isNaN(low)) {
             showError("标准值与上下偏差必须为有效数字");
             return;
@@ -192,6 +205,10 @@ public class StandardConfigController {
             showError("控制区偏移量不能为负数");
             return;
         }
+        if (mRows < 1 || mRows > 30 || mCols < 1 || mCols > 10) {
+            showError("矩阵行数需 1~30、列数需 1~10");
+            return;
+        }
 
         if (cfg != null) {
             cfg.getStandard().setStandardValue(std);
@@ -221,6 +238,9 @@ public class StandardConfigController {
             cfg.setPlcStartOffset(startOff);
             cfg.setPlcStopOffset(stopOff);
             cfg.setPlcResetOffset(resetOff);
+
+            cfg.setMatrixRows(mRows);
+            cfg.setMatrixCols(mCols);
         }
         if (onSaved != null) onSaved.run();
         close();
